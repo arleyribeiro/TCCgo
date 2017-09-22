@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">LISTA DE REGRAS</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel panel-primary">
+      <div class="panel-heading">Título da Regra</div>
+      <div class="panel-body">
+        <label for="pattern">Padrão: </label>
+        <span>Nome do Padrão</span>
+        <label for="warning">Aviso: </label>
+        <span>Aviso relacionado a regra</span>
+      </div>
+      <div class="panel-footer">Tipo da regra</div>
+    </div>
+    <!-- AQUI VEM A LISTA DAS REGRAS A SEREM UTILIZADAS -->
+    <!-- SERÃO COLOCADAS A PARTIR DO JAVASCRIPT -->
+  </div>
+</div>
+{% endblock %}
