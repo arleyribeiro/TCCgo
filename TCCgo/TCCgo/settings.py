@@ -102,6 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Telling Django what User to user  
+AUTH_USER_MODEL = 'authentication.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
