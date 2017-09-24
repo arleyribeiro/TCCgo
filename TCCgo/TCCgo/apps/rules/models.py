@@ -1,27 +1,5 @@
 from django.db import models
 
-# Create your models here.
-class RuleManager(models.Manager):
-
-    def create_rule(self, pattern, warning, name, weight, type):
-        """ Create a rule and save it to the database."""
-        new_rule = Rule(pattern=pattern, warning=warning, name=name, weigth=weight)
-        new_rule.rule_type_fk = RuleType.objects.get(type=type)
-        new_rule.save()
-        print("Regra " + name + " criada.")
-        return new_rule;
-
-    def delete_rule(self, name):
-        """ Given a rule name, delete it from the database."""
-        try:
-            rule = self.get(name=name)
-            rule.delete()
-            print("Regra " + name + "deletada.")
-            return True
-        except Rule.DoesNotExists:
-            print("A regra digitada não existe")
-            return None
-
 class Rule(models.Model):
     """Has a pattern and a warning. Is searched in the text while scanning it."""
     pattern = models.CharField(max_length=50, blank=False, null=False)
@@ -35,8 +13,6 @@ class Rule(models.Model):
         blank=False,
         null=True,
     )
-
-    objects = RuleManager()
 
 class RuleType(models.Model):
     """It's an enum for the Rule field."""
