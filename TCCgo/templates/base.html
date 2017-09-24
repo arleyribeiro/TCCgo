@@ -9,8 +9,11 @@
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css.map' %}">
     <title>{% block titleBlock %}{% endblock %}</title>
+
+    <!--Angular is the only js that is placed here-->
+    <script src="{% static 'general/js/angular.min.js' %}"></script>
   </head>
-  <body>
+  <body ng-app="myApp">
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -42,7 +45,7 @@
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Perfil</li>
+            <li><a href="#">Perfil</a></li>
             <li></li>
             <li></li>
           </ul>
@@ -52,7 +55,6 @@
     {% block content %}{% endblock %}
 
     <script src="{% static 'general/js/jquery.min.js' %}"></script>
-    <script src="{% static 'general/js/angular.min.js' %}"></script>
     <script src="{% static 'general/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'rules/js/rules.js' %}"></script>
   </body>

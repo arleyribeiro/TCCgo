@@ -14,10 +14,10 @@ class RuleController(object):
         print("Regra " + name + " criada.")
         return new_rule;
 
-    def delete(name):
+    def delete(id):
         """ Given a rule name, delete it from the database."""
         try:
-            rule = self.get(name=name)
+            rule = self.get(id=id)
             rule.delete()
             print("Regra " + name + "deletada.\n")
             return True
@@ -25,10 +25,10 @@ class RuleController(object):
             print("A regra digitada não existe.\n")
             return True
 
-    def get(name):
+    def get(id):
         """Given a rule name, return it if exists."""
         try:
-            rule = RuleType.objects.get(name=name)
+            rule = RuleType.objects.get(id=id)
             return rule
         except Rule.DoesNotExists:
             print("O tipo de regra digitado não existe.\n")
@@ -48,9 +48,9 @@ class RuleTypeController(object):
         new_rule_type.save()
         return new_rule_type
 
-    def delete(type):
+    def delete(id):
         try:
-            rule_type = RuleType.objects.get(type=type)
+            rule_type = RuleType.objects.get(id=id)
             rule_type.delete()
             print("Tipo de regra " + type + " deletado.\n")
             return True
@@ -58,9 +58,9 @@ class RuleTypeController(object):
             print("O tipo de regra digitado não existe.\n")
             return False
 
-    def get(type):
+    def get(id):
         try:
-            rule_type = RuleType.objects.get(type=type)
+            rule_type = RuleType.objects.get(id=id)
             return rule_type
         except RuleType.DoesNotExists:
             print("O tipo de regra digitado não existe.\n")

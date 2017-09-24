@@ -8,8 +8,15 @@
     </div>
   </div>
   <div class="row">
-    <div id="rules_container">
-      <!--Aqui entram as regras com javascript-->
+    <div id="rules_container" ng-controller="ruleController">
+      <div class="panel panel-primary" ng-repeat="rule in rules">
+        <div class="panel-heading" ng-bind="rule.fields.name"></div>
+        <div class="panel-body">
+          <p>Pattern: <span ng-bind="rule.fields.pattern"></span></p>
+          <p>Warning: <span ng-bind="rule.fields.warning"></span></p>
+        </div>
+        <div class="panel-footer" ng-bind="rule.fields.rule_type_fk.type"></div>
+      </div>
     </div>
   </div>
 </div>
