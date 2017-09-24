@@ -5,12 +5,10 @@ $(document).ready(function(){
     url:'/rules/all_rules',
     dataType: 'json',
     success: function(data) {
-      new_data = JSON.parse(data);
-      alert(data);
-      // for (rules in data){
-      //   conter++;
-      // }
-      // alert(counter);
+      rules = JSON.parse(data);
+       for(var i=0; i<rules.length; i++){
+         $("#rules_container").append("<p>Rule: " + rules[i].fields.name + "</p>");
+       }
     }
   })
 });
