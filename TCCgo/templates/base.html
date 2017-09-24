@@ -4,10 +4,10 @@
     {% load staticfiles %}
     <meta charset="utf-8">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.min.css.map' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css.map' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap-theme.min.css.map' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css.map' %}">
     <title>{% block titleBlock %}{% endblock %}</title>
   </head>
   <body>
@@ -50,10 +50,10 @@
       </div>
     </nav>
     {% block content %}{% endblock %}
-    <script src="{% static 'js/angular.min.js' %}"></script>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
-    {% block script %}{% endblock %}
+
+    <script src="{% static 'general/js/jquery.min.js' %}"></script>
+    <script src="{% static 'general/js/angular.min.js' %}"></script>
+    <script src="{% static 'general/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'rules/js/rules.js' %}"></script>
   </body>
 </html>

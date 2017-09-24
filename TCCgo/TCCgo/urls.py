@@ -21,4 +21,5 @@ urlpatterns = [
 
     url(r'^$', include('TCCgo.apps.core.urls', namespace='core')), # Main application
     url(r'^auth/', include('TCCgo.apps.authentication.urls', namespace='authentication')), # Authentication application
+    url(r'^rules/', include('TCCgo.apps.rules.urls', namespace='rules')), # Rules management
 ]

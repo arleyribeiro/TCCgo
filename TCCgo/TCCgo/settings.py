@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'TCCgo.apps.core',
     'TCCgo.apps.authentication',
+    'TCCgo.apps.rules',
 ]
 
 MIDDLEWARE = [
@@ -102,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Telling Django what User to user  
+# Telling Django what User to user
 AUTH_USER_MODEL = 'authentication.User'
 
 
