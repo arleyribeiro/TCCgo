@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
-from django.http import HttpResponse
+from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponseRedirect
 
 from .controller import (
     UserController
@@ -32,9 +33,15 @@ def login(request):
 		if user is not None:
 			if user.is_active:
 				auth_login(request,user)
-				return HttpResponse('Authenticated')
+				return HttpResponseRedirect("/")
 		else:
 			return HttpResponse('Invalid Login'+' '+email+' '+password +' <p> não funciona para rute, a documentação é inimiga da perfeicao')
 	else:
 		return render(request,'login.html')
+
+
+def logout(request):
+	auth_logout(request)
+	print('log')
+	return HttpResponseRedirect("/")
 
