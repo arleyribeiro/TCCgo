@@ -29,8 +29,32 @@
             <button type="button" class="btn btn-danger">Remover</button>
           </div>
         </div>
-        <!-- <div class="panel-footer" ng-bind="rule.fields.rule_type_fk.type"></div> -->
       </div>
+
+      <!-- Add new rule template -->
+      <form class="hide" method="post" action="{% url 'rules:create_rule' %}" id="add-new-rule-template">
+        {% csrf_token %}
+        <div class="panel panel-primary" >
+          <div class="panel-heading">
+            <label for="rule_name">Nome: </label>
+            <input type="text" name="rule_name">
+          </div>
+          <div class="panel-body">
+            <div class="col-md-6">
+              <label for="rule_pattern">Padrão: </label>
+              <input type="text" name="rule_pattern"><br>
+              <label for="rule_warning">Aviso: </label>
+              <input type="text" name="rule_warning"><br>
+            </div>
+            <div class="col-md-1 col-md-offset-2">
+              <button type="submit" id="save_button" class="btn btn-success">Salvar</button>
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+              <button type="button" id="cancel_button" class="btn btn-danger">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="col-md-8 col-md-offset-4">
       <button class="btn btn-success" id="add-new-rule-button"><span class="glyphicon glyphicon-plus"></span>Nova Regra</button>

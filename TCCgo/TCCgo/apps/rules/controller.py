@@ -6,6 +6,9 @@ from .models import (
 
 class RuleController(object):
 
+    def __init__(self):
+        pass
+
     def create(pattern, warning, name, weight, type):
         """ Create a rule and save it to the database."""
         new_rule = Rule(pattern=pattern, warning=warning, name=name, weight=weight)
@@ -40,6 +43,15 @@ class RuleController(object):
         for rule in all_rules:
             print(rule.name + "\n")
         return all_rules
+
+    def create_with_request(self, request):
+        # TODO: doesn't work
+        name = request.POST.get('rule_name')
+        pattern = request.POST.get('rule_pattern')
+        warning = request.POST.get('rule_warning')
+        rule_type = 'Gramatical'
+        return self.create(pattern, warning, name, 5, rule_type)
+
 
 class RuleTypeController(object):
     def create(type):
