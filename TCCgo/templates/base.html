@@ -4,11 +4,13 @@
     {% load staticfiles %}
     <meta charset="utf-8">
 
+    <title>{% block titleBlock %}{% endblock %}</title>
+
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap-theme.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap-theme.min.css.map' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'general/css/bootstrap.min.css.map' %}">
-    <title>{% block titleBlock %}{% endblock %}</title>
+    {% block links %}{% endblock %}
 
     <!--Angular is the only js that is placed here-->
     <script src="{% static 'general/js/angular.min.js' %}"></script>
@@ -32,7 +34,7 @@
             {%endif%}
             {% if user.is_authenticated %}
               <li><a href="{% url 'authentication:register' %}">Cadastrar</a></li>
-              
+
               <li><a href="#">Análisar</a></li>
               <li><a href="#">Relatórios</a></li>
             {% endif %}
@@ -75,7 +77,6 @@
 
     <script src="{% static 'general/js/jquery.min.js' %}"></script>
     <script src="{% static 'general/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'rules/js/rules.js' %}"></script>
     {% block script %}{% endblock %}
   </body>
 </html>

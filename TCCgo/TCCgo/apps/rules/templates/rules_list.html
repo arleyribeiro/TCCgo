@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block titleBlock%}Regras{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="/static/rules/css/rules.css">
+{% endblock %}
+
 {% block content%}
 <div class="container-fluid">
   <div class="row">
@@ -8,17 +14,32 @@
     </div>
   </div>
   <div class="row">
-    <div id="rules_container" ng-controller="ruleController">
+    <div id="rules_container" class="col-md-8 col-md-offset-2" ng-controller="ruleController">
       <div class="panel panel-primary" ng-repeat="rule in rules">
         <div class="panel-heading" ng-bind="rule.fields.name"></div>
         <div class="panel-body">
-          <p>Pattern: <span ng-bind="rule.fields.pattern"></span></p>
-          <p>Warning: <span ng-bind="rule.fields.warning"></span></p>
+          <div class="col-md-6">
+            <p>Pattern: <span ng-bind="rule.fields.pattern"></span></p>
+            <p>Warning: <span ng-bind="rule.fields.warning"></span></p>
+          </div>
+          <div class="col-md-1 col-md-offset-2">
+            <button type="button" class="btn btn-primary">Editar</button>
+          </div>
+          <div class="col-md-1 col-md-offset-1">
+            <button type="button" class="btn btn-danger">Remover</button>
+          </div>
         </div>
-        <div class="panel-footer" ng-bind="rule.fields.rule_type_fk.type"></div>
+        <!-- <div class="panel-footer" ng-bind="rule.fields.rule_type_fk.type"></div> -->
+      </div>
+      <div class="col-md-8 col-md-offset-4" id="add-new-rule-panel">
+        <a ><span class="glyphicon glyphicon-plus"></span>Adicionar nova regra</a>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block script%}
+  <script src="/static/rules/js/rules.js"></script>
 {% endblock %}
