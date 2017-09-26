@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'TCCgo.apps.rules',
     'TCCgo.apps.faq',
     'TCCgo.apps.forum',
+    'TCCgo.apps.text',
 ]
 
 MIDDLEWARE = [
