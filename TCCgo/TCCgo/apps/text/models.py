@@ -1,30 +1,12 @@
 from django.db import models
-
-class Fragment(models.Model):
-	content = models.CharField(max_length=50, null=False, blank=False)
-	position = models.IntegerField()
-	line = models.IntegerField()
-	# inconsistency_id_fk = models.ForeignKey(
-    #     'Inconsistency',
-    #     on_delete = models.CASCADE,
-    #     blank=False,
-    #     null=False,
-    # )
+from TCCgo.apps.authentication.models import User
 
 class Text(models.Model):
-	content = models.IntegerField()
-	title = models.CharField(max_length=50, null=False, blank=False)
-    # TODO: Ver isso no lab
-	# fragment_id_fk = models.ForeignKey(
-    #     'Fragment',
-    #     on_delete = models.CASCADE,
-    #     blank=False,
-    #     null=False,
-    # )
+	content = models.TextField(null=False, blank=False)
+	title = models.CharField(max_length=150, null=True, blank=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
 
-    # fragment_inconsistency_id_fk = models.ForeignKey(
-    #     'Inconsistency',
-    #     on_delete = models.SET_NULL,
-    #     blank=False,
-    #     null=False,
-    # )
+class Fragment(models.Model):
+	content = models.TextField(null=False, blank=False)
+	position = models.IntegerField(null=False, blank=False)
+	text = models.ForeignKey(Text, on_delete=models.CASCADE, null=False, blank=False)

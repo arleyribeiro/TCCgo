@@ -45,7 +45,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     # Each teacher or student must have an enroll number
     enroll_number = models.CharField(db_index=True, max_length=30, unique=True)
-
+    is_teacher = models.BooleanField(default=False)
+    birth_date = models.DateField(null=True)
+    created_at = models.DateField(auto_now=True)
+    course = models.CharField(max_length=255, null=True)
     # Define what field will be used to log in the system
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

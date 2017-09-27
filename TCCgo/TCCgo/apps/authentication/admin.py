@@ -5,5 +5,5 @@ from .models import User
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
     list_display = ['username', 'email', 'enroll_number']
-    
+
 admin.site.register(User, UserAdmin)
