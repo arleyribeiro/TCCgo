@@ -12,4 +12,4 @@ class Post(models.Model):
 	index = models.IntegerField()
 	date = models.DateField(auto_now=True)
 	reply = models.ForeignKey('self', on_delete = models.SET_NULL, blank=True, null=True)
-	topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=False, null=False)
+	topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=False, null=True)
