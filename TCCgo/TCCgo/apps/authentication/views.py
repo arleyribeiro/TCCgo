@@ -23,6 +23,16 @@ def create_user(request):
     user_controller.request_create(request)
     return render(request, 'index.html');
 
+def delete_user(request):
+    user_controller = UserController()
+    user_controller.request_delete(request)
+    return render(request, 'index.html');
+
+def update_user(request):
+    user_controller = UserController()
+    user_controller.request_delete(request)
+    return render(request, 'index.html');
+
 def login(request):
 	if request.method == 'POST':
 		email = password = ''
@@ -45,4 +55,3 @@ def logout(request):
 	auth_logout(request)
 	print('log')
 	return HttpResponseRedirect("/")
-
