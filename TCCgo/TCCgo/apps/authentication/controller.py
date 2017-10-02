@@ -1,5 +1,8 @@
-from django.db import models
 from pprint import pprint
+
+from django.db import models
+from django.contrib.auth import login as auth_login
+
 from .models import (
     User
 )
@@ -52,10 +55,39 @@ class UserController(object):
         else:
             return None
 
-    def reqeust_delete(self, request):
+    def request_delete(self, request):
         session_user = request.user
         if session_user != None:
             session_user_id = session_user.id
             return self.delete(session_user_id)
         else:
             return None
+
+    def authenticate(self, email=None, password=None):
+        print("sdfsdf " +email+ ' ' + password)
+        try:
+            user = User.objects.get(email=email)
+            print("cheguei " + user.password + ' ' + password)
+            if password == user.password:
+              print('ok')
+              return user
+            else:
+              print('erro')
+              return None
+        except User.DoesNotExist:
+            print('asdfghj')
+            return None
+
+    def request_login(self, request):
+        if request.method == 'POST':
+            email = request.POST.get('email','')
+            password = request.POST.get('password','')
+            user = UserController.authenticate(request, email=email, password=password)
+            if user is not None:
+                if user.is_active:
+                    auth_login(request,user)
+                    return 200 # Sucess
+                else:
+                    return 300 # Invalid
+            else:
+                return 404 # Error

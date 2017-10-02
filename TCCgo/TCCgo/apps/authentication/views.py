@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -34,21 +33,13 @@ def update_user(request):
     return render(request, 'index.html');
 
 def login(request):
-	if request.method == 'POST':
-		email = password = ''
-		email = request.POST.get('email','')
-		password = request.POST.get('password','')
-		user = User.authenticate(request, email=email, password=password)
-
-		print (user)
-		if user is not None:
-			if user.is_active:
-				auth_login(request,user)
-				return HttpResponseRedirect("/")
-		else:
-			return HttpResponse('Invalid Login'+' '+email+' '+password +' <p> não funciona para rute, a documentação é inimiga da perfeicao')
-	else:
-		return render(request,'login.html')
+    status = UserController().request_login(request)
+    if(status == 200):
+        return HttpResponseRedirect("/")
+    elif(status == 300):
+        return HttpResponse('Invalid Login'+' '+email+' '+password +' <p> não funciona para rute, a documentação é inimiga da perfeicao')
+    else:
+        return render(request,'login.html')
 
 
 def logout(request):
