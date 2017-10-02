@@ -19,22 +19,35 @@ $("#add-new-rule-button").click(function(){
   $newform = $template.clone();
   // Show the pre-existent template
   $template.removeClass('hide');
+  $template.addClass('add-new-rule-form')
   // Append the hided template
   $('#rules_container').append($newform);
   // Hide button while you add a new rule
   $(this).addClass('hide');
 });
 
+
 // POST form config
-$("#add-new-rule-template").on('submit', function(){
+$("#add-new-rule-template").submit(function(e){
   // Cancel the usual submit behavior
-  event.preventDefault();
+  e.preventDefault();
+
   // Return the button
   $('#add-new-rule-button').removeClass('hide');
+
+  // Get the inputs value to send on Ajax
+  var $inputs = $(".add-new-rule-form :input");
+  var sending_data = {};
+  $inputs.each(function(){
+    sending_data[this.name] = $(this).val();
+    $(this).siblings("label[for=" + $(this).attr('name') + "]").after("<span>" + $(this).val() + "</span>");
+    $(this).remove();
+  });
   $.ajax({
-    url: '/rules/create_rule',
+    url: $(this).attr('action'),
     type: $(this).attr('method'),
-    data: $(this).serialize(),
+    data: sending_data,
+    dataType: 'json',
     success: function(response){
       alert("Success");
     },

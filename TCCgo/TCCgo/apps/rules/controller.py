@@ -9,10 +9,10 @@ class RuleController(object):
     def __init__(self):
         pass
 
-    def create(pattern, warning, name, weight, type):
+    def create(pattern, warning, name, weight, type, user):
         """ Create a rule and save it to the database."""
-        new_rule = Rule(pattern=pattern, warning=warning, name=name, weight=weight)
-        new_rule.rule_type_fk = RuleType.objects.get(type=type)
+        new_rule = Rule(pattern=pattern, warning=warning, name=name, weight=weight, user=user)
+        new_rule.rule_type = RuleType.objects.get(type=type)
         new_rule.save()
         print("Regra " + name + " criada.")
         return new_rule;
@@ -37,20 +37,20 @@ class RuleController(object):
             print("O tipo de regra digitado não existe.\n")
             return None
 
-    def get_all():
+    def get_all(user):
         """Return all Rules in the database"""
         all_rules = Rule.objects.all()
-        for rule in all_rules:
-            print(rule.name + "\n")
+        all_rules = Rule.objects.all().filter(user=user)
         return all_rules
 
-    def create_with_request(self, request):
+    def create_with_request(request):
         # TODO: doesn't work
         name = request.POST.get('rule_name')
         pattern = request.POST.get('rule_pattern')
         warning = request.POST.get('rule_warning')
         rule_type = 'Gramatical'
-        return self.create(pattern, warning, name, 5, rule_type)
+        user = request.user
+        return RuleController.create(pattern, warning, name, 5, rule_type, user)
 
 
 class RuleTypeController(object):
