@@ -80,21 +80,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.username
 
-    def authenticate(self, email=None, password=None):
-        print("sdfsdf " +email+ ' ' + password)
-        try:
-            user = User.objects.get(email=email)
-            print("cheguei " + user.password + ' ' + password)
-            if password == user.password:
-              print('ok')
-              return user
-            else:
-              print('erro')
-              return None
-        except User.DoesNotExist:
-            print('asdfghj')
-            return None
-
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)

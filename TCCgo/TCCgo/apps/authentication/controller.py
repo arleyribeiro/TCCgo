@@ -1,7 +1,9 @@
 from django.db import models
 from django.forms import model_to_dict
-from pprint import pprint
+from django.db import models
+from django.contrib.auth import login as auth_login
 import json
+
 from .models import (
     User
 )
@@ -68,6 +70,7 @@ class UserController(object):
         else:
             return None
 
+
     def request_get_logged_user(self, request):
         if request.user.is_authenticated :
             session_user = request.user
@@ -80,3 +83,32 @@ class UserController(object):
                 return False
         else:
             return False
+
+    def authenticate(self, email=None, password=None):
+        print("sdfsdf " +email+ ' ' + password)
+        try:
+            user = User.objects.get(email=email)
+            print("cheguei " + user.password + ' ' + password)
+            if password == user.password:
+              print('ok')
+              return user
+            else:
+              print('erro')
+              return None
+        except User.DoesNotExist:
+            print('asdfghj')
+            return None
+
+    def request_login(self, request):
+        if request.method == 'POST':
+            email = request.POST.get('email','')
+            password = request.POST.get('password','')
+            user = UserController.authenticate(request, email=email, password=password)
+            if user is not None:
+                if user.is_active:
+                    auth_login(request,user)
+                    return 200 # Sucess
+                else:
+                    return 300 # Invalid
+            else:
+                return 404 # Error

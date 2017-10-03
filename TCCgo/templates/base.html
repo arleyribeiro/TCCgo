@@ -36,6 +36,7 @@
             {% if user.is_authenticated %}
               <li><a href="#">Análisar</a></li>
               <li><a href="#">Relatórios</a></li>
+              <li><a href="{% url 'rules:rules_list' %}">Regras</a></li>
             {% endif %}
 
             <li class="dropdown">
