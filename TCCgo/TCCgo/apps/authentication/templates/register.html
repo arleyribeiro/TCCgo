@@ -5,11 +5,16 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container" ng-controller="registerController">
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
+      {% if user.is_authenticated %}
+      <h3>Atualização</h3>
+      {% endif %}
+      {% if not user.is_authenticated %}
       <h3>Registro</h3>
+      {% endif %}
       <hr>
     </div>
     <div class="col-md-3"></div>
@@ -22,32 +27,40 @@
         <div class="form-group row">
           <label for="username" class="col-md-2 col-form-label">Usuário</label>
           <div class="col-md-10">
-            <input type="text" class="form-control" id="username" name="username" placeholder="ana">
+            <input type="text" class="form-control" id="username" name="username" ng-model="user.username" placeholder="ana">
           </div>
         </div>
         <div class="form-group row">
           <label for="email" class="col-md-2 col-form-label">E-mail</label>
           <div class="col-md-10">
-            <input type="email" class="form-control" id="email" name="email" placeholder="ana@email.com">
+            <input type="email" class="form-control" id="email" name="email" ng-model="user.email" placeholder="ana@email.com">
           </div>
         </div>
+        {% if not user.is_authenticated %}
         <div class="form-group row">
           <label for="password" class="col-md-2 col-form-label">Senha</label>
           <div class="col-md-10">
             <input type="password" class="form-control" id="password" name="password" placeholder="********">
           </div>
         </div>
+        {% endif %}
         <div class="form-group row">
           <label for="enroll_number" class="col-md-2 col-form-label">Matrícula</label>
           <div class="col-md-10">
-            <input type="text" class="form-control" id="enroll_number" name="enroll_number" placeholder="201512050423">
+            <input type="text" class="form-control" id="enroll_number" name="enroll_number" ng-model="user.enroll_number" placeholder="201512050423">
           </div>
         </div>
         <div class="form-group row">
           <div class="col-md-2"></div>
           <div class="col-md-10">
             <div class="text-right">
+              {% if user.is_authenticated %}
+              <button id="bt_update" type="button" ng-click="remove_user()" class="btn btn-danger">Remover</button>
+              <button id="bt_update" type="button" ng-click="update_user()" class="btn btn-primary">Atualizar</button>
+              {% endif %}
+              {% if not user.is_authenticated %}
               <button type="submit" class="btn btn-primary">Registrar</button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -60,6 +73,47 @@
 
 {% block script %}
 <script type="text/javascript">
+var app = angular.module("myApp", []);
+app.controller("registerController", function($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  $scope.teste = "teste";
+  $scope.user = {
+    username: '',
+    email: '',
+    enroll_number: ''
+  };
+  $http.get('/auth/get_logged_user').then(function(data){
+    if(data != false)
+    {
+      var logged_user = data.data;
+      $scope.user.username = logged_user.username;
+      $scope.user.email = logged_user.email;
+      $scope.user.enroll_number = logged_user.enroll_number;
+    }
+
+  });
+
+  $scope.update_user = function(){
+    $http.post(
+     '/auth/register/update_user',
+     $scope.user
+   ).then(function(data){
+     if(data != false)
+     {
+       var update_user = data.data;
+       $scope.user.username = update_user.username;
+       $scope.user.email = update_user.email;
+       $scope.user.enroll_number = update_user.enroll_number;
+     }
+   });
+  }
+
+  $scope.remove_user = function(){
+
+  }
+});
 
 </script>
 {% endblock %}
