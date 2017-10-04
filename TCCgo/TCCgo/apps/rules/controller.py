@@ -9,9 +9,9 @@ class RuleController(object):
     def __init__(self):
         pass
 
-    def create(pattern, warning, name, weight, type, user):
+    def create(pattern, warning, name, type, user):
         """ Create a rule and save it to the database."""
-        new_rule = Rule(pattern=pattern, warning=warning, name=name, weight=weight, user=user)
+        new_rule = Rule(pattern=pattern, warning=warning, name=name, user=user)
         new_rule.rule_type = RuleType.objects.get(type=type)
         new_rule.save()
         print("Regra " + name + " criada.")
@@ -50,7 +50,7 @@ class RuleController(object):
         warning = request.POST.get('rule_warning')
         rule_type = 'Gramatical'
         user = request.user
-        return RuleController.create(pattern, warning, name, 5, rule_type, user)
+        return RuleController.create(pattern, warning, name, rule_type, user)
 
 
 class RuleTypeController(object):

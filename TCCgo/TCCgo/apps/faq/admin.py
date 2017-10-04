@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ['question', 'answer']
+
+admin.site.register(Question, QuestionAdmin)
