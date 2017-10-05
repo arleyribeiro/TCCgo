@@ -1,0 +1,9 @@
+manage.py shell
+
+from TCCgo.apps.faq.controller import QuestionController
+
+QuestionController.create('O que é o TCC-go?','O TCC-go é uma aplicação que visa facilitar e otimizar a correção de TCCs, Trabalhos de Conclusão de Curso, por meio de auxílio na identificação de inconsistências.')
+QuestionController.create('Para quem o TCC-go foi desenvolvido?','O TCC-go foi desenvolvido para alunos e orientadores que queiram verificar inconsistências no TCC.')
+QuestionController.create('Preciso criar conta para submeter arquivo?','Sim, para submeter arquivo é necessário criar conta.')
+QuestionController.create('Como o TCC-go analisa os textos submetidos?','O TCC-go identifica inconsistências por meio de regras. As regras são expressões regulares usadas para identificar padrões, palavras, e construções frasais inadequadas. As regras são mantidas em um banco de dados, e podem ser cadastradas pela comunidade, professores e alunos.')
+quit()
