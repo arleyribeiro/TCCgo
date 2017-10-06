@@ -14,43 +14,54 @@
     </div>
   </div>
   <div class="row">
-    <div id="rules_container" class="col-md-8 col-md-offset-2" ng-controller="ruleController">
+    <div id="rules_container" class="col-md-8 col-md-offset-2" ng-controller="RuleController">
       <div class="panel panel-primary" ng-repeat="rule in rules">
         <div class="panel-heading" ng-bind="rule.fields.name"></div>
         <div class="panel-body">
           <div class="col-md-6">
-            <p>Pattern: <span ng-bind="rule.fields.pattern"></span></p>
-            <p>Warning: <span ng-bind="rule.fields.warning"></span></p>
+            <p>Padrão: <span ng-bind="rule.fields.pattern"></span></p>
+            <p>Aviso: <span ng-bind="rule.fields.warning"></span></p>
           </div>
           <div class="col-md-1 col-md-offset-2">
-            <button type="button" class="btn btn-primary">Editar</button>
+            <button id="edit-button" type="button" class="btn btn-primary">Editar</button>
           </div>
           <div class="col-md-1 col-md-offset-1">
-            <button type="button" class="btn btn-danger">Remover</button>
+            <button id="remove-button" type="button" class="btn btn-danger">Remover</button>
           </div>
         </div>
       </div>
 
-      <!-- Add new rule template -->
-      <form class="hide" method="post" action="{% url 'rules:create_rule' %}" id="add-new-rule-template">
+      <!-- Add new rule form -->
+      <form  method="post" action="{% url 'rules:create_rule' %}" id="new-rule-form">
         {% csrf_token %}
         <div class="panel panel-primary" >
           <div class="panel-heading">
             <label for="rule_name">Nome: </label>
-            <input type="text" name="rule_name">
+            <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste">
           </div>
           <div class="panel-body">
-            <div class="col-md-6">
+            <div class="col-md-3 form-group">
               <label for="rule_pattern">Padrão: </label>
-              <input type="text" name="rule_pattern"><br>
+              <input class="form-control" type="text" name="rule_pattern"><br>
               <label for="rule_warning">Aviso: </label>
-              <input type="text" name="rule_warning"><br>
+              <textarea class="form-control" rows="5" name="rule_warning"></textarea>
             </div>
-            <div class="col-md-1 col-md-offset-2">
-              <button type="submit" id="save_button" class="btn btn-success">Salvar</button>
+            <div class="col-md-2">
+              <input type="radio" name="rule_scope" value="PU">Public<br>
+              <input type="radio" name="rule_scope" value="PV">Private
+            </div>
+            <div class="col-md-2" ng-controller="RuleTypeController">
+              {% verbatim %}
+              <div ng-repeat="type in types">
+                <input type="radio" name="rule_type" ng-value="type.fields.type">{{ type.fields.type }}
+              </div>
+              {% endverbatim %}
             </div>
             <div class="col-md-1 col-md-offset-1">
-              <button type="button" id="cancel_button" class="btn btn-danger">Cancelar</button>
+              <button type="submit" id="save-button" class="btn btn-success">Salvar</button>
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+              <button type="button" id="cancel-button" class="btn btn-danger">Cancelar</button>
             </div>
           </div>
         </div>

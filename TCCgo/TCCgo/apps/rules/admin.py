@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import *
 
 class RuleAdmin(admin.ModelAdmin):
-    list_display = ['pattern', 'warning', 'name', 'date']
+    list_display = ['pattern', 'warning', 'name', 'date', 'scope']
 
 class RuleTypeAdmin(admin.ModelAdmin):
     list_display = ['type']
