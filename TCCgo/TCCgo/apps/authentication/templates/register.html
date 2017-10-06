@@ -22,32 +22,67 @@
   <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-      <form method="post" action="create_user">
+      <form method="post" action="create_user" id="myForm" name="myForm" ng-submit="send($event)" novalidate>
         {% csrf_token %}
         <div class="form-group row">
           <label for="username" class="col-md-2 col-form-label">Usuário</label>
           <div class="col-md-10">
-            <input type="text" class="form-control" id="username" name="username" ng-model="user.username" placeholder="ana">
+            <input type="text" class="form-control" id="username" name="username" ng-model="user.username" required placeholder="ana">
+            <span style="color:red" ng-show="myForm.username.$touched && myForm.username.$invalid">
+              <span ng-show="myForm.username.$error.required">Campo Obrigatório</span>
+            </span>
           </div>
         </div>
         <div class="form-group row">
           <label for="email" class="col-md-2 col-form-label">E-mail</label>
           <div class="col-md-10">
-            <input type="email" class="form-control" id="email" name="email" ng-model="user.email" placeholder="ana@email.com">
+            <input type="email" class="form-control" id="email" name="email" ng-model="user.email" required  placeholder="ana@email.com">
+            <span style="color:red" ng-show="myForm.email.$touched && myForm.email.$invalid">
+              <span ng-show="myForm.email.$error.required">Campo Obrigatório</span>
+              <span ng-show="myForm.email.$error.email">E-mail inválido</span>
+            </span>
           </div>
         </div>
         {% if not user.is_authenticated %}
         <div class="form-group row">
           <label for="password" class="col-md-2 col-form-label">Senha</label>
           <div class="col-md-10">
-            <input type="password" class="form-control" id="password" name="password" placeholder="********">
+            <input type="password" class="form-control" id="password" name="password" ng-model="user.password" ng-minlength="6" required placeholder="********">
+            <span style="color:red" ng-show="myForm.password.$touched && myForm.password.$invalid">
+              <span ng-show="myForm.password.$error.required">Campo Obrigatório</span>
+              <span ng-show="myForm.password.$error.minlength">Senha deve conter mais de 6 caracteres</span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="check" class="col-md-2 col-form-label">Confirmação de Senha</label>
+          <div class="col-md-10">
+            <input type="password" class="form-control" id="check" name="check" ng-model="user.check" ng-focus="check_password()" required placeholder="********">
+            <span style="color:red" ng-show="myForm.check.$touched && dismatch_pass">
+              <span ng-show="dismatch_pass">Senhas não batem</span>
+            </span>
           </div>
         </div>
         {% endif %}
         <div class="form-group row">
-          <label for="enroll_number" class="col-md-2 col-form-label">Matrícula</label>
+          <label for="select_interest" class="col-md-2 col-form-label">Área de Interesse</label>
           <div class="col-md-10">
-            <input type="text" class="form-control" id="enroll_number" name="enroll_number" ng-model="user.enroll_number" placeholder="201512050423">
+            <select class="form-control" name="select_interest" ng-model="select_interest" id="select_interest">
+              <option value="Não Especificar" selected='selected'>Não Especificar</option>
+              <option value="Artes">Artes</option>
+              <option value="Ciência Política">Ciência Política</option>
+              <option value="Educação">Educação</option>
+              <option value="Letras">Letras</option>
+              <option value="Linguística">Linguística</option>
+              <option value="Psicologia">Psicologia</option>
+              <option value="Outra">Outra</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row" ng-show="select_interest == 'Outra'">
+          <label for="interest" class="col-md-2 col-form-label">Especificar</label>
+          <div class="col-md-10">
+            <input type="text" class="form-control" id="interest" name="interest" ng-model="user.interest" placeholder="Tecnologia da Informação">
           </div>
         </div>
         <div class="form-group row">
@@ -55,11 +90,12 @@
           <div class="col-md-10">
             <div class="text-right">
               {% if user.is_authenticated %}
-              <button id="bt_update" type="button" ng-click="remove_user()" class="btn btn-danger">Remover</button>
+              <button id="bt_update" type="button" ng-click="delete_user()" class="btn btn-danger">Remover</button>
               <button id="bt_update" type="button" ng-click="update_user()" class="btn btn-primary">Atualizar</button>
               {% endif %}
               {% if not user.is_authenticated %}
-              <button type="submit" class="btn btn-primary">Registrar</button>
+              <button ng-disabled="myForm.username.$invalid || myForm.email.$invalid || myForm.password.$invalid || myForm.check.$invalid || dismatch_pass
+              " type="submit" class="btn btn-primary">Registrar</button>
               {% endif %}
             </div>
           </div>
@@ -78,41 +114,126 @@ app.controller("registerController", function($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-  $scope.teste = "teste";
   $scope.user = {
     username: '',
     email: '',
-    enroll_number: ''
+    interest: '',
+    password: '',
+    check: ''
   };
+
+  $scope.is_logged = false;
+  $scope.dismatch_pass = false;
+  $scope.valid_pass = false;
+  $scope.select_interest = 'Não Especificar';
+
+
+  $scope.send = function (e) {
+      e.preventDefault();
+
+      response = confirm("Tem certeza que deseja registrar usuário?");
+      if(response){
+        $http.post('/auth/check_unique_email', {email:$scope.user.email}).then(function(response){
+
+          if(response.data == true)
+          {
+            $('form#myForm').submit();
+          }
+          else{
+            alert("O e-mail informado já está registrado no sistema!");
+          }
+        });
+      }
+  }
+
   $http.get('/auth/get_logged_user').then(function(data){
-    if(data != false)
+    if(data.data != false)
     {
+      $scope.is_logged = true;
       var logged_user = data.data;
       $scope.user.username = logged_user.username;
       $scope.user.email = logged_user.email;
-      $scope.user.enroll_number = logged_user.enroll_number;
+      if($("select#select_interest option[value='"+logged_user.interest+"']").length > 0){
+        $scope.select_interest = logged_user.interest;
+        $scope.user.interest = logged_user.interest;
+      }
+      else{
+        $scope.select_interest = 'Outra';
+        $scope.user.interest = logged_user.interest;
+      }
+
+
     }
 
   });
 
   $scope.update_user = function(){
-    $http.post(
-     '/auth/register/update_user',
-     $scope.user
-   ).then(function(data){
-     if(data != false)
-     {
-       var update_user = data.data;
-       $scope.user.username = update_user.username;
-       $scope.user.email = update_user.email;
-       $scope.user.enroll_number = update_user.enroll_number;
+    response = confirm("Tem certeza que deseja atualizar os dados de usuário?");
+    if(response){
+      $http.post(
+       '/auth/register/update_user',
+       $scope.user
+     ).then(function(data){
+       if(data != false)
+       {
+         var update_user = data.data;
+         $scope.user.username = update_user.username;
+         $scope.user.email = update_user.email;
+         $scope.user.interest = update_user.interest;
+         alert("Usuário atualizado com sucesso!");
+       }
+     });
+    }
+  }
+
+  $scope.delete_user = function(){
+    response = confirm("Tem certeza que deseja remover este usuário?");
+    if(response){
+      $http.get('/auth/register/delete_user').then(function(data){
+        var response = data.data;
+        if(response['success'])
+        {
+          alert("Usuário removido com sucesso");
+          window.location.reload();
+        }
+        else{
+          alert("Falha ao remover usuário");
+        }
+      });
+    }
+  }
+
+  $scope.$watch("select_interest", function(newValue,oldValue){
+     if(newValue == 'Outra'){
+       if(!$scope.is_logged)
+       {
+         $scope.user.interest = "";
+       }
+       else{
+         $scope.is_logged = !$scope.is_logged;
+       }
      }
-   });
+     else {
+       $scope.user.interest = $scope.select_interest;
+     }
+  });
+
+  $scope.$watch("user.check", function(newValue,oldValue){
+     $scope.check_password();
+  });
+
+  $scope.check_password = function(){
+    if($scope.user.password == $scope.user.check)
+    {
+      $scope.dismatch_pass = false;
+    }
+    else
+    {
+      $scope.dismatch_pass = true;
+    }
   }
 
-  $scope.remove_user = function(){
 
-  }
 });
 
 </script>
