@@ -14,22 +14,40 @@ def rules_list(request):
     return render(request, 'rules_list.html')
 
 def get_all_rules(request):
-    """ Retunr a Json containing all the rules in the database"""
-    query_set = RuleController.get_all(request.user)
+    """ Return a Json containing all the rules in the database linked to the current user """
+    controller = RuleController()
+    query_set = controller.get_all(request.user)
+    data = serializers.serialize('json', query_set)
+    return JsonResponse(data, safe=False)
+
+def get_all_types(request):
+    """ Return a Json containing all the rule types in the database"""
+    controller = RuleTypeController()
+    query_set = controller.get_all()
     data = serializers.serialize('json', query_set)
     return JsonResponse(data, safe=False)
 
 def create_rule(request):
-    # """Create a rule from a post form in rule_list.html"""
-    # rule_name = request.POST.get('rule_name')
-    # rule_pattern = request.POST.get('rule_pattern')
-    # rule_warning = request.POST.get('rule_warning')
-    # print("Padrao da regra: " + rule_name)
-    # print("Padrao da regra: " + rule_warning)
-    # print("Padrao da regra: " + rule_pattern)
-    # RuleController.create(rule_pattern, rule_warning, rule_name, 5, 'Gramatical')
-    RuleController.create_with_request(request)
-    result = {}
-    result['status'] = "Success"
-    response = json.dumps(result)
+    controller = RuleController()
+    rule = controller.create_with_request(request)
+    response = {}
+    if(rule is not None):
+        response['status'] = "Success"
+    else:
+        response['status'] = "False"
+        # Gambiarra para o angular funcionar
+        new_rule['fields'] = rule;
+    return JsonResponse(response, safe=False)
+
+def verify_name(request):
+    """Return True if a rule name already exists in database"""
+    controller = RuleController()
+    rule_name = request.GET.get('name')
+    print("Nome recebido da regra: " + rule_name)
+    rule = controller.get(name=rule_name)
+    response = {}
+    if(rule is None):
+        response['status'] = False
+    else:
+        response['status'] = True
     return JsonResponse(response, safe=False)

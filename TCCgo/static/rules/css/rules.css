@@ -1,3 +1,11 @@
 #add-new-rule-button {
   font-size: 30px;
 }
+
+#name-input{
+  color: black;
+}
+
+.popover-title, .popover-content{
+  color: black;
+}

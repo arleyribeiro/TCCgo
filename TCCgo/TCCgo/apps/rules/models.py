@@ -19,6 +19,11 @@ class Rule(models.Model):
     date = models.DateField(auto_now=True)
     rule_type = models.ForeignKey(RuleType, on_delete = models.PROTECT, blank=False, null=False)
     user = models.ForeignKey(User, on_delete = models.SET_NULL, blank=False, null=True)
+    SCOPE_CHOICES = (
+        ('PU', 'Public'),
+        ('PR', 'Private')
+    )
+    scope = models.CharField(max_length=2, choices=SCOPE_CHOICES, default='PU')
 
     def __str__(self):
         return self.name
