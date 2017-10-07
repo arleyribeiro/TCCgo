@@ -39,16 +39,17 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     # db_index means that the database will make an index for lookups
-    username = models.CharField(db_index=True, max_length=255, unique=True)
-    email = models.EmailField(db_index=True, unique=True)
+    username = models.CharField(db_index=True, max_length=255, blank=False, null=False)
+    email = models.EmailField(db_index=True, unique=True, blank=False, null=False)
+    interest = models.CharField(max_length=255, blank=True, null=True)
     # is_staff is used to define superusers
     is_staff = models.BooleanField(default=False)
     # Each teacher or student must have an enroll number
-    enroll_number = models.CharField(db_index=True, max_length=30, unique=True)
+    #enroll_number = models.CharField(db_index=True, max_length=30, unique=True)
     is_teacher = models.BooleanField(default=False)
-    birth_date = models.DateField(null=True)
+    #birth_date = models.DateField(null=True)
     created_at = models.DateField(auto_now=True)
-    course = models.CharField(max_length=255, null=True)
+    #course = models.CharField(max_length=255, null=True)
     # Define what field will be used to log in the system
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
