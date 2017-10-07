@@ -1,28 +1,26 @@
 var app = angular.module("myApp", []);
 
-// Listing rules
-
+// Listing all rules of a user
 app.controller("RuleController", function($scope, $http){
   $http.get('/rules/all_rules')
-  .then(function(data){
-    rules = JSON.parse(data.data);
-    $scope.rules = rules;
+  .then(function(response){
+    //rules = JSON.parse(data.data);
+    $scope.rules = response.data['rules'];
   })
 });
 
-// Listing rule types
+// Listing rule types (used in radio buttons)
 app.controller("RuleTypeController", function($scope, $http){
   $http.get('/rules/all_types')
-  .then(function(data){
-    types = JSON.parse(data.data)
-    $scope.types = types;
+  .then(function(response){
+    $scope.types = response.data['types'];
   })
 })
 
 /* Adding new Rules */
 
 function verify_name(name){
-  // Given a name, verify if it exists in database. If exists, return true
+  /* Given a name, verify if it exists in database. If exists, return true */
   $.ajax({
     url: 'verify_name',
     method: 'get',
@@ -45,7 +43,7 @@ function verify_name(name){
 }
 
 function validate_rule_form($form){
-  // Validate a form passed and return false if not valid, or a dict if valid
+  /* Validate a form passed and return false if not valid, or a dict if valid */
   var fields = $form.serializeArray();
   var response = {}; // Will have all the fields
   $.each(fields, function(i, field){ // Loop form inputs
@@ -60,10 +58,13 @@ function validate_rule_form($form){
 }
 
 $('#name-input').change(function(){
+  /* Every time someone types a rule name, verify if it already exists in database*/
   verify_name($(this).val());
 });
 
 $('#new-rule-form').submit(function(event){
+  /* Actions performed when send a new rule to be created */
+
   // Prevent submitting
   event.preventDefault();
 
@@ -88,13 +89,12 @@ $('#new-rule-form').submit(function(event){
       data: response,
       dataType: 'json',
       success: function(response){
-        alert("Regra Criada com sucesso");
-        // As linhas abaixo não funcionam
-        // var rules_scope = angular.element($('#rules_container')).scope();
-        // rules_scope.$apply(function(){
-        //   rules_scope.rules.push(response.rule);
-        // });
-        // rules_scope.$digest();
+        // Adding the new rule to the page
+        var rules_scope = angular.element($('#rules_container')).scope();
+        rules_scope.$apply(function(){
+          rules_scope.rules.push(response['new_rule']);
+        });
+        rules_scope.$digest();
       },
       error: function(response){
         alert("Failure");

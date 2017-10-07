@@ -10,7 +10,7 @@ class RuleController(object):
         pass
 
     def create(self, pattern, warning, name, scope, type, user):
-        """ Create a rule and save it to the database."""
+        """ Create a rule and save it to the database """
         rule = self.get(name=name)
         if(rule is None): # Rule name doesn't exists in the database
             new_rule = Rule(pattern=pattern, warning=warning, name=name, scope=scope, user=user)
@@ -24,7 +24,7 @@ class RuleController(object):
 
 
     def delete( self, user, id=None, name=None):
-        """ Given a rule name or id, delete it from the database."""
+        """ Given a rule name or id, delete it from the database """
         rule = self.get(id=id, name=name)
         if(rule is not None):
             if(user == rule.user):
@@ -39,7 +39,7 @@ class RuleController(object):
             return True
 
     def get(self, id=None, name=None):
-        """Given a rule name or id, return it if exists."""
+        """ Given a rule name or id, return it if exists """
         try:
             if(id is not None):
                 rule = Rule.objects.get(id=id)
@@ -54,13 +54,13 @@ class RuleController(object):
             return None
 
     def get_all(self, user):
-        """Return all Rules in the database linked to an especific user."""
+        """ Return all Rules in the database linked to an especific user """
         all_rules = Rule.objects.all()
         all_rules = Rule.objects.all().filter(user=user)
         return all_rules
 
     def create_with_request(self, request):
-        """Given a request, create a rule with the data in it."""
+        """ Given a request, create a rule with the data in it """
         name = request.POST.get('rule_name')
         pattern = request.POST.get('rule_pattern')
         warning = request.POST.get('rule_warning')
@@ -72,22 +72,24 @@ class RuleController(object):
 
 class RuleTypeController(object):
     def create(self, type):
-        """ Create a ruleType and save it to the database"""
+        """ Create a ruleType and save it to the database """
         new_rule_type = RuleType(type=type)
         new_rule_type.save()
         return new_rule_type
 
     def delete(self, id):
-        try:
-            rule_type = RuleType.objects.get(id=id)
+        """ Delete a rule type with the given id """
+        rule_type = self.get(id=id)
+        if(rule_type is not None):
             rule_type.delete()
             print("Tipo de regra " + type + " deletado.\n")
             return True
-        except RuleType.DoesNotExist:
+        else:
             print("O tipo de regra digitado não existe.\n")
             return False
 
     def get(self, id):
+        """ Return a rule type with the given id """
         try:
             rule_type = RuleType.objects.get(id=id)
             return rule_type
@@ -96,6 +98,6 @@ class RuleTypeController(object):
             return None
 
     def get_all(self):
-        """Return all rule types in the database"""
+        """ Return all rule types in the database """
         all_types = RuleType.objects.all()
         return all_types
