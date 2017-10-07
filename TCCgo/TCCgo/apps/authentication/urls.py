@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^get_logged_user', views.get_logged_user, name='get_logged_user'),
     url(r'^check_unique_email', views.check_unique_email, name='check_unique_email'),
     url(r'^register/update_user', views.update_user, name='update_user'),
+    url(r'^check_login', views.check_login, name='check_login'),
 ]
