@@ -69,6 +69,13 @@ class RuleController(object):
         user = request.user
         return self.create(pattern, warning, name, scope, rule_type, user)
 
+    def delete_with_request(self, request):
+        """ Given a request, delete the rule inside it """
+        name = request.POST.get('rule_name')
+        user = request.user
+        return self.delete(user, name=name)
+
+
 
 class RuleTypeController(object):
     def create(self, type):

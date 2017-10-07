@@ -15,9 +15,7 @@ app.controller("RuleTypeController", function($scope, $http){
   .then(function(response){
     $scope.types = response.data['types'];
   })
-})
-
-/* Adding new Rules */
+});
 
 function verify_name(name){
   /* Given a name, verify if it exists in database. If exists, return true */
@@ -57,48 +55,122 @@ function validate_rule_form($form){
   return response;
 }
 
-$('#name-input').change(function(){
-  /* Every time someone types a rule name, verify if it already exists in database*/
-  verify_name($(this).val());
-});
+function csrfSafeMethod(method) {
+    // Used on setting the token to send Ajax
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
 
-$('#new-rule-form').submit(function(event){
-  /* Actions performed when send a new rule to be created */
+$(document).ready(function(){
+  /* Setting up behavior of elements */
 
-  // Prevent submitting
-  event.preventDefault();
+  // Adding token to AJAX
+  var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+  });
 
-  // Ask user if he is sure about it
-  var confirmation = confirm("Tem certeza que deseja salvar a regra?");
-  if(!confirmation){
-    return false;
-  }
+  $('#name-input').change(function(){
+    /* Every time someone types a rule name, verify if it already exists in database*/
+    verify_name($(this).val());
+  });
 
-  // Verify if there is empty fields and convert inputs into dict
-  var response = validate_rule_form($(this));
-  if(response === false){ // Some field is empty
-    alert("Todos os campos devem ser preenchidos");
-    return false;
-  }
+  $('#new-rule-form').submit(function(event){
+    /* Actions performed when send a new rule to be created */
 
-  // Start sending the new rule to be created
-  else{ // All fields have something
+    // Prevent submitting
+    event.preventDefault();
+
+    // Ask user if he is sure about it
+    var confirmation = confirm("Tem certeza que deseja salvar a regra?");
+    if(!confirmation){
+      return false;
+    }
+
+    // Verify if there is empty fields and convert inputs into dict
+    var response = validate_rule_form($(this));
+    if(response === false){ // Some field is empty
+      alert("Todos os campos devem ser preenchidos");
+      return false;
+    }
+    else{ // All fields have something
+      // Clearing form fields
+      $('#new-rule-form').each(function(){
+        this.reset()
+      });
+
+      // Hiding the form for later
+      $('#new-rule-form').addClass("hide");
+      // Returning the button
+      $('#add-new-rule-button').removeClass("hide");
+
+      // Start sending the new rule to be created
+      $.ajax({
+        url: $(this).attr('action'),
+        method : $(this).attr('method'),
+        data: response,
+        dataType: 'json',
+        success: function(response){
+
+          // Adding the new rule to the page
+          var rules_scope = angular.element($('#rules_container')).scope();
+          rules_scope.$apply(function(){
+            rules_scope.rules.push(response['new_rule']);
+          });
+          rules_scope.$digest();
+        },
+        error: function(response){
+          alert("Failure");
+        }
+      });
+    }
+  });
+
+  $(document).on('click', '#add-new-rule-button', function(){
+    $new_form = $('#new-rule-form').clone() // Make a new hidden form for future creatings
+    $('#new-rule-form').removeClass("hide");  // Make a form appear
+    $(this).addClass("hide"); // Hide the button
+    $(this).before($new_form);  // Insert the hidden form before the button
+  });
+
+
+  $(document).on('click', '.remove-button',  function(){
+    // Way to remove rules in the rule list page
+    var confirmation = confirm("Tem certeza que deseja deletar essa regra?");
+    if(!confirmation){  // Respondeu nao
+      return false;
+    }
+    var $parent_div = $(this).parent();
+    var $grandparent_div = $parent_div.parent();
+    var rule_name = $grandparent_div.siblings('.panel-heading').text();
+    var response = {};
+    response['rule_name'] = rule_name;
     $.ajax({
-      url: $(this).attr('action'),
-      method : $(this).attr('method'),
+      url: 'delete_rule',
+      method: 'post',
       data: response,
-      dataType: 'json',
-      success: function(response){
-        // Adding the new rule to the page
+      success: function(data){
+        alert('Regra deletada com sucesso!')
+
+        // After deleting, update the page without deleted rule
         var rules_scope = angular.element($('#rules_container')).scope();
         rules_scope.$apply(function(){
-          rules_scope.rules.push(response['new_rule']);
+          $.ajax({
+            url: '/rules/all_rules',
+            method: 'get',
+            success: function(response){
+                rules_scope.rules = response['rules'];
+                rules_scope.$digest();
+            }
+          });
         });
-        rules_scope.$digest();
       },
-      error: function(response){
-        alert("Failure");
+      error: function(){
+        alert("Failure")
       }
     });
-  }
+  });
 });

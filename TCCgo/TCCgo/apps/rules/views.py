@@ -42,6 +42,14 @@ def create_rule(request):
         response['status'] = "False"
     return JsonResponse(response, safe=False)
 
+def delete_rule(request):
+    """ Delete a rule passed in the request"""
+    controller = RuleController()
+    status = controller.delete_with_request(request)
+    response = {}
+    response['status'] = status
+    return JsonResponse(response, safe=False)
+
 def verify_name(request):
     """ Return True if a rule name already exists in database """
     controller = RuleController()
