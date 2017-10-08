@@ -141,26 +141,16 @@ class UserController(object):
         except User.DoesNotExist:
             return None
 
-    def check_email(self, email = None):
-        try:
-            user = User.objects.get(email=email)
-            return user
-        except User.DoesNotExist:
-            return None
 
     def request_check_login(self, request):
         user_json = json.loads(request.body.decode('utf-8'))
         email = user_json['email']
         password = user_json['password']
         user = UserController.authenticate(request, email=email, password=password)
-        user2 = UserController.check_email(request, email)
 
         if user is not None:
             if user.is_active:
                 auth_login(request,user)
                 return 200 # Sucess
         else:
-            if user2 is None:
-                return 404 # email invalida
-            if user2 is not None and user is None:
-                return 300 # senha invalido
+            return 300 # Invalid
