@@ -22,6 +22,9 @@
           <label for="user" class="col-md-2 col-form-label">Usuário</label>
           <div class="col-md-10">
             <input type="email" class="form-control" id="email" name="email" ng-model="user.email" required placeholder="ana@email.com">
+            <div style="color:red; font-size:150%" align="right" ng-if="type_error == 404" >
+              <span>Email não encontrado</span>
+            </div>
           </div>
         </div>
 
@@ -29,8 +32,11 @@
           <label for="password" class="col-md-2 col-form-label">Senha</label>
           <div class="col-md-10">
             <input type="password" class="form-control" id="password" name="password" ng-model="user.password" required placeholder="********">
-            <div style="color:red; font-size:150%" align="right" ng-show="invalid" >
-              <span>Login Inválido</span>
+            <div style="color:red; font-size:150%" align="right" ng-if="type_error == 300" >
+              <span>Senha Inválida</span>
+              <div style="color:red; font-size:150%" align="right" ng-if="type_error == 1" >
+                <span>Login Inválido</span>
+              </div>
             </div>
           </div>
         </div>
@@ -62,6 +68,7 @@
       password: ''
     };
     $scope.invalid = false;
+    $scope.type_error = 0;
 
     $scope.send = function (e) {
         e.preventDefault();
@@ -69,12 +76,21 @@
         alert($scope.user.email + '  ' + $scope.user.password);
           $http.post('/auth/check_login', $scope.user).then(function(response){
 
+            alert(response.data['falha']+'  ' + response.data['url']);
             if(response.data['success'])
             {
-              window.location = 'http://localhost:8000';
+              window.location = response.data['url'];
             }
             else{
               $scope.invalid = true;
+              if(response.data['falha'] == 300){ // senha invalida
+                $scope.type_error = 300;
+              }else if(response.data['falha'] == 404){ // email invalida
+                $scope.type_error = 404;
+              }
+              else{
+                $scope.type_error = 1;
+              }
             }
           });
         }

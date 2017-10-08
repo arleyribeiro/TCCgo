@@ -67,13 +67,20 @@ def login(request):
     return render(request, 'login.html')
 
 def check_login(request):
+    '''
+        Falha 200  -> success
+        Falha 300  -> senha errada
+        Falha 404  -> email errado
+    '''
     user_controller = UserController();
     status = user_controller.request_check_login(request)
 
     if(status == 200):
-        return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+        return JsonResponse({'success':True, 'url':'http://localhost:8000', 'falha':[]}, safe=False)
+    elif(status == 300):
+        return JsonResponse({'success':False, 'url':[], 'falha':300}, safe=False)
     else:
-        return JsonResponse({'success':False}, safe=False)
+        return JsonResponse({'success':False,'url':[], 'falha':404}, safe=False)
 
 def logout(request):
 	auth_logout(request)
