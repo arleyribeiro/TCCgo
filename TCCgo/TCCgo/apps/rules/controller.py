@@ -1,4 +1,7 @@
+import json
+
 from django.db import models
+from django.db.models import Q
 
 from .models import (
     Rule, RuleType
@@ -74,6 +77,13 @@ class RuleController(object):
         name = request.POST.get('rule_name')
         user = request.user
         return self.delete(user, name=name)
+
+    def filter_with_request(self, request):
+        """ Given a request with a search text, filter rules by it"""
+        filter_json = json.loads(request.body.decode('utf-8'))
+        filter = filter_json['search_text']
+        rules = Rule.objects.filter(Q(name__icontains=filter) | Q(pattern__icontains=filter))
+        return rules
 
 
 

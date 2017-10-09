@@ -1,12 +1,34 @@
 var app = angular.module("myApp", []);
 
-// Listing all rules of a user
+
 app.controller("RuleController", function($scope, $http){
+  /*
+    Controller for the list of rules shown
+  */
+  // Setting up for post requests
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  // Listing all rules of a user as loading page
   $http.get('/rules/all_rules')
   .then(function(response){
-    //rules = JSON.parse(data.data);
     $scope.rules = response.data['rules'];
-  })
+  });
+
+  // Filtering rules shown by search
+  $scope.searchText = "";
+  $scope.filterRules = function(){
+    alert("Efetuando busca por: " + $scope.searchText)
+    $http.post('/rules/filter_rules',
+      {
+        'search_text' : $scope.searchText
+      }
+    ).then(function(response){
+      $scope.rules = response.data['filtered_rules'];
+      $scope.$digest();
+    });
+  };
+
 });
 
 // Listing rule types (used in radio buttons)

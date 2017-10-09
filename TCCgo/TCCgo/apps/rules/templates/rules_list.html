@@ -15,6 +15,7 @@
   </div>
   <div class="row">
     <div id="rules_container" class="col-md-8 col-md-offset-2" ng-controller="RuleController">
+      <input type="text" name="rule_search" ng-change="filterRules()" ng-model="searchText">
       <div class="panel panel-primary" ng-repeat="rule in rules">
         <div class="panel-heading" ng-bind="rule.name"></div>
         <div class="panel-body">

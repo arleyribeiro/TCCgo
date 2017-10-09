@@ -30,6 +30,14 @@ def get_all_types(request):
     response['types'] = list(query_set.values())
     return JsonResponse(response, safe=False)
 
+def filter_rules(request):
+    """ Return a filtered by name set of rules"""
+    controller = RuleController()
+    query_set = controller.filter_with_request(request)
+    response = {}
+    response['filtered_rules'] = list(query_set.values())
+    return JsonResponse(response, safe=False)
+
 def create_rule(request):
     """ Create a rule, save it to the database and return it to javascript """
     controller = RuleController()
