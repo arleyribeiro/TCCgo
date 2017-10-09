@@ -18,7 +18,6 @@ app.controller("RuleController", function($scope, $http){
   // Filtering rules shown by search
   $scope.searchText = "";
   $scope.filterRules = function(){
-    alert("Efetuando busca por: " + $scope.searchText)
     $http.post('/rules/filter_rules',
       {
         'search_text' : $scope.searchText
