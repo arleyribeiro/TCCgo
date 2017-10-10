@@ -68,7 +68,7 @@
 
     $scope.send = function (e) {
         e.preventDefault();
-        alert($scope.user.email + '  ' + $scope.user.password);
+        //alert($scope.user.email + '  ' + $scope.user.password);
           $http.post('/auth/check_login', $scope.user).then(function(response){
 //            alert(response.data['url']);
             if(response.data['success'])

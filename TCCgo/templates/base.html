@@ -34,6 +34,7 @@
               <li><a href="{% url 'authentication:register' %}">Cadastrar</a></li>
             {%endif%}
             {% if user.is_authenticated %}
+              <li><a href="{% url 'text:submit_page' %}">Submeter novo texto</a></li>
               <li><a href="#">Análisar</a></li>
               <li><a href="#">Relatórios</a></li>
               <li><a href="{% url 'rules:rules_list' %}">Regras</a></li>
