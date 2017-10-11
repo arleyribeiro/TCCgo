@@ -13,10 +13,15 @@ from .models import (
     Text, Fragment
 )
 
+def index(request):
+    return render(request, 'index.html');
 
 # Create your views here.
 def text_page(request):
 	return render(request, 'submit.html')
+
+def all_texts_page(request):
+	return render(request, 'list.html')
 
 def submit_text(request):
 	text_controller = TextController()
@@ -25,3 +30,9 @@ def submit_text(request):
 		return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
 	else:
 		return HttpResponseRedirect("/")
+
+def get_all_texts(request):
+	query_set = TextController.get_all()
+	data = serializers.serialize('json', query_set)
+	#print data
+	return JsonResponse(data, safe=False)

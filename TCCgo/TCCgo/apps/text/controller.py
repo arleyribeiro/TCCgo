@@ -45,8 +45,8 @@ class TextController(object):
 
 
     def get_all():
-        text = Text.objects.all()
-        return text
+        texts = Text.objects.all()
+        return texts
 
 class FragmentController(object):
 

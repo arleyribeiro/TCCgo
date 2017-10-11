@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^rules/', include('TCCgo.apps.rules.urls', namespace='rules')), # Rules management
     url(r'^faqs/', include('TCCgo.apps.faq.urls', namespace='faqs')),
     url(r'^forum/', include('TCCgo.apps.forum.urls', namespace='forum')),
-    url(r'^text', include('TCCgo.apps.text.urls', namespace='text')),
+    url(r'^text/', include('TCCgo.apps.text.urls', namespace='text')),
 ]
