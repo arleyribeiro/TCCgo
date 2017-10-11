@@ -22,6 +22,6 @@ def submit_text(request):
 	text_controller = TextController()
 	status = text_controller.request_create(request)
 	if status == 200:
-		return HttpResponse('Sucesso')
+		return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
 	else:
-		return HttpResponse('Falha views.py')
+		return HttpResponseRedirect("/")
