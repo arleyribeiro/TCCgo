@@ -15,6 +15,12 @@ app.controller("RuleController", function($scope, $http){
     $scope.rules = response.data['rules'];
   });
 
+  // listing all rule types inside radio buttons
+  $http.get('/rules/all_types')
+  .then(function(response){
+    $scope.types = response.data['types'];
+  })
+
   // Filtering rules shown by search
   $scope.searchText = "";
   $scope.filterRules = function(){
@@ -28,17 +34,32 @@ app.controller("RuleController", function($scope, $http){
     });
   };
 
+  // Set edit mode for a rule
+  $scope.edit = function(index){
+    // Changing content of panel. TODO: specificate which div to edit in the list
+    $('.rule').addClass('hide');
+    $('.edit-rule').removeClass('hide');
+
+    // Setting cancel button behavior
+    $('#cancel-edit-button').click(function(){
+      $('.rule').removeClass('hide');
+      $('.edit-rule').addClass('hide');
+    });
+
+    // TODO: get element by its index passed to the function (html element) to specificate the content to change
+  }
+
 });
 
-// Listing rule types (used in radio buttons)
 app.controller("RuleTypeController", function($scope, $http){
+  /* List rule types that the database have */
   $http.get('/rules/all_types')
   .then(function(response){
     $scope.types = response.data['types'];
   })
 });
 
-function verify_name(name){
+function verify_name(name, element){
   /* Given a name, verify if it exists in database. If exists, return true */
   $.ajax({
     url: 'verify_name',
@@ -48,11 +69,11 @@ function verify_name(name){
     },
     success: function(data){
       if(data.status){ // There is a rule with that name already
-        $("#name-input").css("border", "2px solid red");
-        $("#name-input").popover("show"/*{title: 'Nome já utilizado', content = 'Teste', trigger='hover'}*/);
+        element.css("border", "2px solid red");
+        element.popover("show"/*{title: 'Nome já utilizado', content = 'Teste', trigger='hover'}*/);
       } else {
-        $("#name-input").css("border", "none")
-        $("#name-input").popover("hide");
+        element.css("border", "none")
+        element.popover("hide");
       }
     },
     error: function(data){
@@ -96,7 +117,7 @@ $(document).ready(function(){
 
   $('#name-input').change(function(){
     /* Every time someone types a rule name, verify if it already exists in database*/
-    verify_name($(this).val());
+    verify_name($(this).val(), $(this));
   });
 
   $('#new-rule-form').submit(function(event){
@@ -151,11 +172,19 @@ $(document).ready(function(){
   });
 
   $(document).on('click', '#add-new-rule-button', function(){
+    /* Show the new rule form */
     $new_form = $('#new-rule-form').clone() // Make a new hidden form for future creatings
-    $('#new-rule-form').removeClass("hide");  // Make a form appear
+    $('#new-rule-form').removeClass('hide');  // Make a form appear
+    $('#new-rule-form').addClass('tmp-form'); // Used on cancel button
     $(this).addClass("hide"); // Hide the button
     $(this).before($new_form);  // Insert the hidden form before the button
   });
+
+  $(document).on('click', '#cancel-button', function(){
+    /* Cancel the creation of a new rule */
+    $('#add-new-rule-button').removeClass('hide'); // Show the new rule button again
+    $('.tmp-form').remove(); // Remove the temporary form created
+  })
 
 
   $(document).on('click', '.remove-button',  function(){
@@ -166,7 +195,8 @@ $(document).ready(function(){
     }
     var $parent_div = $(this).parent();
     var $grandparent_div = $parent_div.parent();
-    var rule_name = $grandparent_div.siblings('.panel-heading').text();
+    var rule_name = $grandparent_div.siblings('.panel-heading.rule').text();
+
     var response = {};
     response['rule_name'] = rule_name;
     $.ajax({

@@ -14,8 +14,11 @@
       <h1 class="text-center">LISTA DE REGRAS</h1>
     </div>
   </div>
+
+  <!-- List of rules container -->
   <div class="row">
     <div id="rules_container" class="col-md-10 col-md-offset-1" ng-controller="RuleController">
+      <!-- Search bar -->
       <div class="input-group input-group-lg">
         <input class="form-control" type="text" name="rule_search" ng-change="filterRules()" ng-model="searchText">
         <span class="input-group-btn">
@@ -23,23 +26,55 @@
         </span>
       </div>
       <br><br>
+      <!-- List of rules -->
       <div class="panel panel-primary" ng-repeat="rule in rules">
-        <div class="panel-heading" ng-bind="rule.name"></div>
+        <div class="panel-heading rule" ng-bind="rule.name"></div>
+        <div class="edit-rule panel-heading hide">
+          <label for="rule_name">Nome: </label>
+          <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste" ng-model="rule.name">
+        </div>
         <div class="panel-body">
-          <div class="col-md-6">
+          <div class="col-md-6 rule">
             <p>Padrão: <span ng-bind="rule.pattern"></span></p>
             <p>Aviso: <span ng-bind="rule.warning"></span></p>
           </div>
-          <div class="col-md-1 col-md-offset-2">
-            <button id="edit-button" type="button" class="btn btn-primary">Editar</button>
+          <div class="col-md-1 col-md-offset-2 rule">
+            <button id="edit-button" type="button" class="btn btn-primary" ng-click="edit($index)">Editar</button>
           </div>
-          <div class="col-md-1 col-md-offset-1">
+          <div class="col-md-1 col-md-offset-1 rule">
             <button type="button" class="btn btn-danger remove-button">Remover</button>
+          </div>
+          <div class="edit-rule hide">
+            <div class="col-md-3 form-group">
+              <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
+              <input class="form-control" type="text" name="rule_pattern" ng-model="rule.pattern"><br>
+              <label for="rule_warning">Aviso: </label>
+              <textarea class="form-control" rows="5" name="rule_warning" ng-model="rule.warning"></textarea>
+            </div>
+            <div class="col-md-2">
+              <label for="rule_scope">Escopo: </label><br>
+              <input type="radio" name="rule_scope" value="PU" ng-model="rule.scope">Public<br>
+              <input type="radio" name="rule_scope" value="PV" ng-model="rule.scope">Private
+            </div>
+            <div class="col-md-2">
+              <label for="rule_type">Tipo: </label>
+              {% verbatim %}
+              <div ng-repeat="type in types"> <!-- Listing rule types in the database -->
+                <input type="radio" name="rule_type" ng-model="type.type">{{ type.type }}
+              </div>
+              {% endverbatim %}
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+              <button type="submit" id="save-edit-button" class="btn btn-success">Salvar</button>
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+              <button type="button" id="cancel-edit-button" class="btn btn-danger">Cancelar</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Add new rule form -->
+      <!-- Form to add a new rule -->
       <form  class="hide" method="post" action="{% url 'rules:create_rule' %}" id="new-rule-form">
         {% csrf_token %}
         <div class="panel panel-primary" >
@@ -77,6 +112,7 @@
         </div>
       </form>
     </div>
+    <!-- Button to show up form to add new rule -->
     <div class="col-md-8 col-md-offset-4">
       <button class="btn btn-success" id="add-new-rule-button"><span class="glyphicon glyphicon-plus"></span>Nova Regra</button>
     </div>
