@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core import serializers
 from pprint import pprint
@@ -27,7 +28,7 @@ def submit_text(request):
 	text_controller = TextController()
 	status = text_controller.request_create(request)
 	if status == 200:
-		return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+		return HttpResponseRedirect("/text/list_texts")#JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
 	else:
 		return HttpResponseRedirect("/")
 
