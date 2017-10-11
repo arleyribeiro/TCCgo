@@ -9,7 +9,7 @@
     <div class="row">
       <div class="row" >
         <div class="col-md-8 col-md-offset-2" style="text-align: center">
-          <h3>Submissão de texto </h3>
+          <h3>Submissão de Trabalho </h3>
           <br />
         </div>
       </div>
@@ -17,25 +17,27 @@
 
     <form  method="post" action="{% url 'text:submit' %}" id="new-text-form" class="col-md-8 col-md-offset-2">
       {% csrf_token %}
-      <div class="panel panel-default">
+    <!--  <div class="panel panel-default">
         <div class="panel-heading"> </div>
-        <div class="panel-body">
+        <div class="panel-body"> -->
           <div class="row">
-            <div class="col-md-2">
-              <label for="text_title">Título: </label>
-            </div>
-              <input  class="form-control" id="title_input" type="text" name="text_title" ng-model="text.title" >
+            <!--
+            <div class="col-md-2">  <label for="text_title">Título: </label>  </div>
+          -->
+              <input  class="form-control" id="title_input" type="text" name="text_title" ng-model="text.title" required placeholder="Título">
           </div>
+            <br />
           <div class="row">
+            <!--
             <label for="text_content">Conteúdo: </label>
-            <textarea class="form-control" id="content_input" name="text_content" style="resize: none; height: 300px" ng-model="text.content" > </textarea>
+          -->
+            <textarea class="form-control" id="content_input" name="text_content" style="resize: none; height: 300px" ng-model="text.content" required placeholder="Corpo do trabalho"> </textarea>
           </div>
-          <button class="btn btn-primary" ng-click="enviar()"> enviar
-
-          </button>
-
-        </div>
-      </div>
+            <br />
+          <button class="btn btn-primary" ng-click="enviar()" style="float: right;"> enviar </button>
+<!--
+</div>
+      </div> -->
     </form>
   </div>
 
@@ -57,7 +59,13 @@ app.controller("textController", function ($scope, $http){
 
   $scope.send = function(){
     $http.post('/text/submit',$scope.text).then(
-      function(response){
+      function(data){
+        var response = data.data;
+        if(response['success'])
+        {
+          alert("Texto cadastrado com sucesso");
+          window.location.reload();
+        }
         //response.data resposta do servidor
       }
     );

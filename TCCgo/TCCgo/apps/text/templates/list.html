@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block titleBlock %} FAQ | TCC go {% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+	<div class="row" >
+		<div class="col-md-8 col-md-offset-2" style="text-align: center">
+			<h3> Consulta de Trabalhos Submetidos </h3>
+    	<br />
+		</div>
+	</div>
+		<div id="questions_container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+
+			<div class="panel panel-default" ng-repeat="text in texts">
+					<div class="panel-heading" ng-bind="text.fields.title">
+							<h4 class="panel-title">
+									<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse"> <span ng-bind="text.fields.title"></span></a>
+							</h4>
+					</div>
+					<div id="collapse" class="panel-collapse collapse in" >
+							<div class="panel-body">
+									<span ng-bind="text.fields.content"></span>
+							</div>
+					</div>
+			</div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+var app = angular.module("myApp", []);
+app.controller("textController", function($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  $http.get('/text/all_texts').then(function(data){
+    var texts = JSON.parse(data.data);
+    $scope.texts = texts;
+  })
+});
+
+</script>
+{% endblock %}
