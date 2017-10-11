@@ -37,11 +37,39 @@ app.controller("RuleController", function($scope, $http){
   // Set edit mode for a rule
   $scope.edit = function(index){
     // Changing content of panel. TODO: specificate which div to edit in the list
+
+    var prev_rule_name = $scope.rules[index].name; // Used to identify the rule being changed
     $('.rule').addClass('hide');
     $('.edit-rule').removeClass('hide');
 
+    // Setting sending button behavior
+    $(document).on('click', '#save-edit-button', function(){
+      $http.post('/rules/update_rule',
+        {
+          'old_name' : prev_rule_name,
+          'new_name' : $scope.rules[index].name,
+          'new_pattern' : $scope.rules[index].pattern,
+          'new_warning' : $scope.rules[index].warning,
+          'new_scope' : $scope.rules[index].scope,
+          // 'new_type' : $scope.rules[index].type // TODO: fix this (it's not sending anything)
+        }
+      ).then(function(response){
+        $('.rule').removeClass('hide');
+        $('.edit-rule').addClass('hide');
+        if(response.data.status == 500){
+          alert("O nome de regra já existe no sistema.")
+          return false;
+        }
+        if(response.data.status == 501){
+          alert('Um usuário só pode atualizar as próprias regras.')
+          return false;
+        }
+        $scope.$digest();
+      });
+    })
+
     // Setting cancel button behavior
-    $('#cancel-edit-button').click(function(){
+    $(document).on('click', '#cancel-edit-button', function(){
       $('.rule').removeClass('hide');
       $('.edit-rule').addClass('hide');
     });
@@ -204,6 +232,10 @@ $(document).ready(function(){
       method: 'post',
       data: response,
       success: function(data){
+        if(data.status == 501){ // Not user rule
+          alert('Um usuário só pode deletar as próprias regras.')
+          return false;
+        }
         alert('Regra deletada com sucesso!')
 
         // After deleting, update the page without deleted rule

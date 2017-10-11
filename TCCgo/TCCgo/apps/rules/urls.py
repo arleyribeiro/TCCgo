@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^verify_name', views.verify_name, name='verify_name'), # Verify if a given name already exists in database
     url(r'^delete_rule', views.delete_rule, name='delete_rule'), # Delete a rule passed in the request
     url(r'^filter_rules', views.filter_rules, name='filter_rules'), # Return a filtered set of rules
+    url(r'^update_rule', views.update_rule, name='update_rule'), # Update a rule with the send data
 ]

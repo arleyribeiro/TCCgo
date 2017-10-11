@@ -36,10 +36,39 @@ class RuleController(object):
                 return True
             else:
                 print("Um usuário não pode deletar a regra de outro")
-                return False
+                return 501
         else:
             print("A regra digitada não existe.\n")
             return True
+
+    def update(self, user, old_name, new_name, new_pattern, new_warning, new_scope, new_type):
+        """ Given rule name and new fields, update the rule """
+        # Testing if the new name already exists in the database and it's not the same
+        test_rule = self.get(name=new_name)
+        if(test_rule is not None and old_name != new_name):
+            print("O novo nome já existe no sistema")
+            return 500
+
+        # Updating rule
+        rule = self.get(name=old_name)
+
+        if(rule is not None):
+            if(user == rule.user): # Current user owns the rule
+                setattr(rule, 'name', new_name)
+                setattr(rule, 'pattern', new_pattern)
+                setattr(rule, 'warning', new_warning)
+                setattr(rule, 'scope', new_scope)
+                # TODO: remove the comment below after fixing the sending type problem
+                # setattr(rule, 'type', new_type)
+                rule.save()
+                print("Regra " + old_name + "atualizada.")
+                return True
+            else:
+                print("Um usuário só pode atualizar suas prórpias regras")
+                return 501
+        else:
+            print("A regra a ser atualizada não existe.\n")
+            return False
 
     def get(self, id=None, name=None):
         """ Given a rule name or id, return it if exists """
@@ -59,7 +88,7 @@ class RuleController(object):
     def get_all(self, user):
         """ Return all Rules in the database linked to an especific user """
         all_rules = Rule.objects.all()
-        all_rules = Rule.objects.all().filter(user=user)
+        all_rules = Rule.objects.all().filter(Q(user=user) | Q(scope='PU'))
         return all_rules
 
     def create_with_request(self, request):
@@ -84,6 +113,20 @@ class RuleController(object):
         filter = filter_json['search_text']
         rules = Rule.objects.filter(Q(name__icontains=filter) | Q(pattern__icontains=filter))
         return rules
+
+    def update_with_request(self, request):
+        """ Given a request with new data to rule, update the rule with the new values """
+
+        update_json = json.loads(request.body.decode('utf-8'))
+        current_user = request.user
+        old_name = update_json['old_name']
+        new_name = update_json['new_name']
+        new_pattern = update_json['new_pattern']
+        new_warning = update_json['new_warning']
+        new_scope = update_json['new_scope']
+        # new_type = update_json['new_type']
+        new_type = None
+        return self.update(current_user, old_name, new_name, new_pattern, new_warning, new_scope, new_type)
 
 
 
