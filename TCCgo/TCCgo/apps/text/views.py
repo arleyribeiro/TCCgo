@@ -28,9 +28,9 @@ def submit_text(request):
 	text_controller = TextController()
 	status = text_controller.request_create(request)
 	if status == 200:
-		return HttpResponseRedirect("/text/list_texts")#JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+		return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
 	else:
-		return HttpResponseRedirect("/")
+		return JsonResponse({'success':False}, safe=False)
 
 def get_all_texts(request):
 	query_set = TextController.get_all()

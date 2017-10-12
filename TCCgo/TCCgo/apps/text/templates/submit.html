@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block titleBlock %} TCC Go {% endblock %}
+{% block titleBlock %} TCC Go | Edição {% endblock %}
 
 {% block content %}
 
-<!-- <h1 class="text-center text-primary">Submissão de texto</h1> -->
-  <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+ <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+   {% if user.is_authenticated %}
     <div class="row">
       <div class="col-md-8 col-md-offset-2" style="text-align: center">
         <h3>Submissão de Trabalho </h3>
@@ -13,32 +13,22 @@
       </div>
     </div>
 
-    <form  method="post" action="{% url 'text:submit' %}" id="new-text-form" class="col-md-8 col-md-offset-2">
+    <form  method="post" action="submit_text" id="new-text-form" name="new-text-form"class="col-md-8 col-md-offset-2" ng-submit="send($event)">
       {% csrf_token %}
-    <!--  <div class="panel panel-default">
-        <div class="panel-heading"> </div>
-        <div class="panel-body"> -->
           <div class="row">
-            <!--
-            <div class="col-md-2">  <label for="text_title">Título: </label>  </div>
-          -->
-              <input  class="form-control" id="title_input" type="text" name="text_title" ng-model="text.title" required placeholder="Título">
+              <input  class="form-control" id="title" type="text" name="title" ng-model="text.title" required placeholder="Título" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+    oninput="setCustomValidity('')"  />
           </div>
             <br />
           <div class="row">
-            <!--
-            <label for="text_content">Conteúdo: </label>
-          -->
-            <textarea class="form-control" id="content_input" name="text_content" style="resize: none; height: 300px" ng-model="text.content" required placeholder="Corpo do trabalho"> </textarea>
+            <textarea class="form-control" id="content" name="content" style="resize: none; height: 300px" ng-model="text.content" required placeholder="Corpo do trabalho" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+  oninput="setCustomValidity('')"  /> </textarea>
           </div>
             <br />
           <button class="btn btn-primary" ng-click="enviar()" style="float: right;"> enviar </button>
-<!--
-</div>
-      </div> -->
     </form>
+    {% endif %}
   </div>
-
 
 {% endblock %}
 
@@ -55,21 +45,19 @@ app.controller("textController", function ($scope, $http){
     content: ''
   }
 
-  $scope.send = function(){
-    $http.post('/text/submit',$scope.text).then(
-      function(data){
-        var response = data.data;
-        if(response['success'])
+  $scope.send = function(e){
+    e.preventDefault();
+
+    $http.post('/text/submit',$scope.text).then(function(response){
+        if(response.data['success'])
         {
           alert("Texto cadastrado com sucesso");
-          window.location.reload();
+        }else{
+          alert("Algo de errado não está certo");
         }
-        //response.data resposta do servidor
       }
     );
   }
-
-
 });
 
 </script>

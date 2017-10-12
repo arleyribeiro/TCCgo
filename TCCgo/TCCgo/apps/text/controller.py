@@ -21,28 +21,24 @@ class TextController(object):
         return new_text
 
     def request_create(self, request):
-        if request.user.is_authenticated :
-            session_user = request.user
-            if session_user != None:
-                session_user_id = session_user.id
-                print("json de texto: "+ request.body.decode('utf-8'))
-                title = request.POST.get("text_title", "titulo")
-                content = request.POST.get("text_content", "conteudo")
-                user = request.user
+        user = request.user
+        if user.is_authenticated :
+            if user != None:
+                try:
+                    text_json = json.loads(request.body.decode('utf-8'))
+                    title = text_json['title']
+                    content = text_json['content']
 
-                # text_json = json.loads(request.body.decode('utf-8'))
-                # title = text_json['title']
-                # content = text_json['content']
-                #print("titulo" + title + "\ncontent : "+ content)
+                    if not title: raise ValueError('str titulo vazio')
+                    if not content: raise ValueError('str conteudo vazio')
 
-                new_text = self.create(title, content, user)
-                dict_text = model_to_dict(new_text, fields = ["title", "content"])
+                    new_text = self.create(title, content, user)
+                    dict_text = model_to_dict(new_text, fields = ["title", "content"])
+                    return 200
 
-                return 200
-            else:
-                return False
-        else: return False
-
+                except ValueError as e:
+                    print ("str vazia")
+        return 300
 
     def get_all():
         texts = Text.objects.all()
