@@ -3,6 +3,7 @@ from django.forms import model_to_dict
 from django.db import models
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
+from django.db.models import Q
 import json
 
 from .models import (
@@ -21,6 +22,7 @@ class TextController(object):
         return new_text
 
     def request_create(self, request):
+        """ Create text from request """
         user = request.user
         if user.is_authenticated :
             if user != None:
@@ -40,7 +42,15 @@ class TextController(object):
                     print ("str vazia")
         return 300
 
+    def request_filter(self, request):
+        """ return filtered texts from request """
+        filter_json = json.loads(request.body.decode('utf-8'))
+        filter = filter_json['search_text']
+        texts = Text.objects.filter(Q(title__icontains=filter) | Q(content__icontains=filter))
+        return texts
+
     def get_all():
+        """ return all texts from databade """
         texts = Text.objects.all()
         return texts
 

@@ -24,16 +24,22 @@ def text_page(request):
 def all_texts_page(request):
 	return render(request, 'list.html')
 
-def submit_text(request):
-	text_controller = TextController()
-	status = text_controller.request_create(request)
-	if status == 200:
-		return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
-	else:
-		return JsonResponse({'success':False}, safe=False)
+def create_text(request):
+    """ create a new text """
+    status = TextController().request_create(request)
+    if status == 200:
+        return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+    else:
+        return JsonResponse({'success':False}, safe=False)
 
 def get_all_texts(request):
-	query_set = TextController.get_all()
-	data = serializers.serialize('json', query_set)
-	#print data
-	return JsonResponse(data, safe=False)
+    """ Return all texts"""
+    query_set = TextController.get_all()
+    data = serializers.serialize('json', query_set)
+    return JsonResponse(data, safe=False)
+
+def filter_texts(request):
+    """ Return a filtered by name set of texts"""
+    query_set = TextController().request_filter(request)
+    response =  serializers.serialize('json', query_set)
+    return JsonResponse(response, safe=False)

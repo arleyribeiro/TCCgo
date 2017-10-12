@@ -4,7 +4,6 @@
 
 {% block content %}
 
-
 <div class="container">
 	<div class="row" >
 		<div class="col-md-8 col-md-offset-2" style="text-align: center">
@@ -12,15 +11,30 @@
     	<br />
 		</div>
 	</div>
-		<div id="questions_container" class="col-md-8 col-md-offset-2" ng-controller="textController">
 
+
+		<div id="accordion" class="col-md-8 col-md-offset-2 panel-group" ng-controller="textController">
+			<div class="input-group input-group col-md-8 col-md-offset-2">
+				<input class="form-control" type="text" name="text_search" ng-change="filterTexts()" ng-model="searchText">
+				<span class="input-group-btn">
+					<button class="btn btn-primary">Buscar</button>
+				</span>
+			</div>
+				<br />
 			<div class="panel panel-default" ng-repeat="text in texts">
-					<div class="panel-heading" ng-bind="text.fields.title">
-							<h4 class="panel-title">
-									<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse"> <span ng-bind="text.fields.title"></span></a>
+					<div class="panel-heading" >
+							<h4 class="row panel-title">
+								<div class="col-md-10">
+									<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordio" href="#collapse{$index}"> <span ng-bind="text.fields.title"></span></a>
+								</div>
+								<div class="col-md-2">
+									<div class="btn-group" style="float: right">
+										  <a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Editar" ><span class="glyphicon glyphicon-pencil" ></span></a>
+										  <a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Deletar"><span class="glyphicon glyphicon-trash" ></span></a>
+								</div>
 							</h4>
 					</div>
-					<div id="collapse" class="panel-collapse collapse in" >
+					<div id="collapse{$index}" class="panel-collapse collapse in" >
 							<div class="panel-body">
 									<span ng-bind="text.fields.content"></span>
 							</div>
@@ -34,14 +48,28 @@
 {% block script %}
 <script type="text/javascript">
 var app = angular.module("myApp", []);
+
 app.controller("textController", function($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-  $http.get('/text/all_texts').then(function(data){
-    var texts = JSON.parse(data.data);
-    $scope.texts = texts;
-  })
+	$http.get('/text/all_texts').then(function(data){
+	  var texts = JSON.parse(data.data);
+	  $scope.texts = texts;
+	})
+
+  $scope.searchText = "";
+  $scope.filterTexts = function(){
+    $http.post('/text/filter_texts',
+      {
+        'search_text' : $scope.searchText
+      }
+    ).then(function(response){
+			var texts = JSON.parse(response.data);
+      $scope.texts = texts;
+      // $scope.$digest();
+    });
+  };
 });
 
 </script>
