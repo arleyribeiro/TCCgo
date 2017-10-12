@@ -22,9 +22,6 @@
           <label for="user" class="col-md-2 col-form-label">Usuário</label>
           <div class="col-md-10">
             <input type="email" class="form-control" id="email" name="email" ng-model="user.email" required placeholder="ana@email.com">
-            <div style="color:red; font-size:150%" align="right" ng-if="type_error == 404" >
-              <span>Email não encontrado</span>
-            </div>
           </div>
         </div>
 
@@ -54,33 +51,5 @@
 
 {% block script %}
 
-<script type="text/javascript">
-  var app = angular.module("myApp", []);
-  app.controller("loginController", function($scope, $http){
-    $http.defaults.xsrfCookieName = 'csrftoken';
-    $http.defaults.xsrfHeaderName = 'X-CSRFToken';
-
-    $scope.user={
-      email: '',
-      password: ''
-    };
-    $scope.invalid = false;
-
-    $scope.send = function (e) {
-        e.preventDefault();
-        //alert($scope.user.email + '  ' + $scope.user.password);
-          $http.post('/auth/check_login', $scope.user).then(function(response){
-//            alert(response.data['url']);
-            if(response.data['success'])
-            {
-              window.location = response.data['url'];
-            }
-            else{
-              $scope.invalid = true;
-            }
-          });
-        }
-
-});
-  </script>
+<script src="/static/authentication/js/login.js"></script>
 {% endblock %}

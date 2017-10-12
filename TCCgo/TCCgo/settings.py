@@ -129,6 +129,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_URL = '/auth/login/'
+
 # Showing Django where are the static files (css, js, whatever)
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
