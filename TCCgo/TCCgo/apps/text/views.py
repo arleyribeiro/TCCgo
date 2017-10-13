@@ -32,9 +32,17 @@ def create_text(request):
     else:
         return JsonResponse({'success':False}, safe=False)
 
+def delete_text(request):
+    """ Delete text from request"""
+    status = TextController().request_delete(request)
+    if status == 200:
+        return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+    else:
+        return JsonResponse({'success':False}, safe=False)
+
 def get_all_texts(request):
     """ Return all texts"""
-    query_set = TextController.get_all()
+    query_set = TextController.get_all(request.user)
     data = serializers.serialize('json', query_set)
     return JsonResponse(data, safe=False)
 
