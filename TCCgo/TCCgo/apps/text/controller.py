@@ -16,6 +16,8 @@ class TextController(object):
 
     def create(self, title, content, user):
         """create a text and save it to database"""
+        texts = Text.objects.all().filter(user=user, title=title)
+        if texts: raise Exception('Já existe esse título no banco')
         new_text = Text(title=title, content=content, user=user)
         new_text.save()
         return new_text
@@ -23,14 +25,14 @@ class TextController(object):
     def delete(self, user, title=None):
         """delete a text from database"""
         if title is not None:
-            text = ger_all(user).filter(title=title)
+            text = get_all(user).filter(title=title)
             if text:
                 text.delete()
                 return True
         print("erro ao deletar")
         return False
 
-    def get_all(user):
+    def get_all( user):
         """ return all texts from databade """
         texts = Text.objects.all().filter(user=user)
         return texts
@@ -49,11 +51,13 @@ class TextController(object):
                     if not content: raise ValueError('str conteudo vazio')
 
                     new_text = self.create(title, content, user)
-                    dict_text = model_to_dict(new_text, fields = ["title", "content"])
+
                     return 200
 
                 except ValueError as e:
                     print ("str vazia")
+                except:
+                    print("erro: titulo repetido")
         return 300
 
     def request_delete(self, request):
