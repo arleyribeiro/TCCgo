@@ -17,25 +17,48 @@ class TextController(object):
     def create(self, title, content, user):
         """create a text and save it to database"""
         texts = Text.objects.all().filter(user=user, title=title)
-        if texts: raise Exception('Já existe esse título no banco')
+        if texts:
+            raise Exception('Já existe esse título no banco')
+        print("'" + title +"'")
         new_text = Text(title=title, content=content, user=user)
         new_text.save()
         return new_text
 
-    def delete(self, user, title=None):
-        """delete a text from database"""
-        if title is not None:
-            text = get_all(user).filter(title=title)
-            if text:
-                text.delete()
-                return True
-        print("erro ao deletar")
-        return False
-
-    def get_all( user):
+    def get_all(user):
         """ return all texts from databade """
         texts = Text.objects.all().filter(user=user)
         return texts
+
+    def get(self, user=None, title=None): # Se o models estiver certo TMJ !
+        """ Given a rule name or id, return it if exists """
+        try:
+            if(user is not None):
+                text = Text.objects.get(user=user, title=title)
+            elif(title is not None):
+                text = Text.objects.get(title=title)
+            else:
+                print("Nenhum parâmentro foi passado para essa função.")
+                text = None
+            return text
+        except Text.DoesNotExist:
+            print("O nome ou id de regra não existe.\n")
+            return None
+
+    def delete(self, user, title=None):
+        """delete a text from database"""
+        text = self.get(user=user, title=title)
+        if title is not None:
+            if(user == text.user):
+                text = TextController.get_all(user).filter(title=title)
+                if text:
+                    text.delete()
+                    return True
+            else:
+                print("Um usuário não pode deletar o texto de outro")
+                return 501
+        return False
+
+
 
     def request_create(self, request):
         """ Create text from request """
@@ -47,8 +70,10 @@ class TextController(object):
                     title = text_json['title']
                     content = text_json['content']
 
-                    if not title: raise ValueError('str titulo vazio')
-                    if not content: raise ValueError('str conteudo vazio')
+                    if not title:
+                        raise ValueError('str titulo vazio')
+                    if not content:
+                        raise ValueError('str conteudo vazio')
 
                     new_text = self.create(title, content, user)
 
@@ -64,17 +89,16 @@ class TextController(object):
         """ delete text from request"""
         user = request.user
         if user.is_authenticated :
-            if user != None:
+            if user is not None:
                 try:
                     text_json = json.loads(request.body.decode('utf-8'))
                     title = text_json['text_title']
 
-                    if not title: raise ValueError('str titulo vazio')
-
+                    if not title:
+                        raise ValueError('str titulo vazio')
                     success = self.delete(user, title)
-
-                    if success: return 200
-
+                    if success:
+                        return 200
                 except ValueError as e:
                     print ("str vazia")
         return 300

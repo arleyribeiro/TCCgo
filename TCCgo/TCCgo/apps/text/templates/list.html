@@ -23,9 +23,11 @@
 		<br />
 
 		<!--Panels  -->
+	<form method="post" action="login" id="myForm" name="myForm" ng-submit="send($event)" validate>
+			{% csrf_token %}
 		<div class="panel panel-default" ng-repeat="text in texts">
-			<div class="panel-heading" >
-					<span ng-bind="text.fields.title" style="font-weight: bold"></span>
+			<div class="panel-heading text" >
+					<span data-id="text.fields.title" ng-bind="text.fields.title" style="font-weight: bold"></span>
 					<div class="btn-group" style="float: right">
 						<a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Editar" ><span class="glyphicon glyphicon-pencil" ></span></a>
 						<button type="button" class="btn btn-primary btn-xs remove-button" data-toggle="tooltip" title="Deletar"><span class="glyphicon glyphicon-trash" ></span></button>
@@ -36,80 +38,10 @@
 				</div>
 		</div>
 	</div>
+</form>
 
 	{% endblock %}
 
 	{% block script %}
-	<script type="text/javascript">
-	var app = angular.module("myApp", []);
-
-	app.controller("textController", function($scope, $http){
-		$http.defaults.xsrfCookieName = 'csrftoken';
-		$http.defaults.xsrfHeaderName = 'X-CSRFToken';
-
-		$http.get('/text/all_texts')
-		.then(function(data){
-			var texts = JSON.parse(data.data);
-			$scope.texts = texts;
-		})
-
-		$scope.searchText = "";
-		$scope.filterTexts = function(){
-			$http.post('/text/filter_texts', {'search_text' : $scope.searchText})
-			.then(function(response){
-				var texts = JSON.parse(response.data);
-				$scope.texts = texts;
-				// $scope.$digest();
-			});
-		};
-	});
-
-	function csrfSafeMethod(method) {
-			// Used on setting the token to send Ajax
-			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-	}
-	$(document).ready(function(){
-		/* Setting up behavior of elements */
-		// Adding token to AJAX
-		var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-		$.ajaxSetup({
-			beforeSend: function(xhr, settings) {
-					if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-							xhr.setRequestHeader("X-CSRFToken", csrftoken);
-					}
-			}
-		});
-
-		$(document).on('click', '.remove-button',  function(){
-			// Way to remove rules in the rule list page
-
-			var confirmation = confirm("Tem certeza que deseja deletar esse trabalho? ");
-			if(!confirmation){  // Respondeu nao
-				return false;
-			}
-			var text_title = $(this).parent().parent().text();
-			var response = {};
-			response['text_title'] = text_title;
-
-			//  $.ajax({
-			// 	url: 'delete_text',
-			// 	method: 'post',
-			// 	data: response,
-			// 	success: function(data){
-			// 		if(data.status == 501){ // Not user rule
-			// 			alert('Um usuário só pode deletar os próprios trabalhos.')
-			// 			return false;
-			// 		}
-			// 		alert('Trabalho deletado com sucesso!')
-			// 	},
-			// 	error: function(){
-			// 		alert("Failure")
-			// 	}
-			// });
-
-		});
-	});
-
-	</script>
+	<script src="/static/text/js/text.js"></script>
 	{% endblock %}
