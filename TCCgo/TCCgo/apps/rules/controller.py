@@ -58,8 +58,7 @@ class RuleController(object):
                 setattr(rule, 'pattern', new_pattern)
                 setattr(rule, 'warning', new_warning)
                 setattr(rule, 'scope', new_scope)
-                # TODO: remove the comment below after fixing the sending type problem
-                # setattr(rule, 'type', new_type)
+                setattr(rule, 'rule_type', RuleType.objects.get(type=new_type))
                 rule.save()
                 print("Regra " + old_name + "atualizada.")
                 return True
@@ -93,17 +92,19 @@ class RuleController(object):
 
     def create_with_request(self, request):
         """ Given a request, create a rule with the data in it """
-        name = request.POST.get('rule_name')
-        pattern = request.POST.get('rule_pattern')
-        warning = request.POST.get('rule_warning')
-        rule_type = request.POST.get('rule_type')
-        scope = request.POST.get('rule_scope')
+        data = json.loads(request.body.decode('utf-8'))
+        name = data['rule_name']
+        pattern = data['rule_pattern']
+        warning = data['rule_warning']
+        rule_type = data['rule_type']
+        scope = data['rule_scope']
         user = request.user
         return self.create(pattern, warning, name, scope, rule_type, user)
 
     def delete_with_request(self, request):
         """ Given a request, delete the rule inside it """
-        name = request.POST.get('rule_name')
+        data = json.loads(request.body.decode("utf-8"))
+        name = data['rule_name']
         user = request.user
         return self.delete(user, name=name)
 
@@ -116,7 +117,7 @@ class RuleController(object):
 
     def update_with_request(self, request):
         """ Given a request with new data to rule, update the rule with the new values """
-
+        print("Corpo do json: " + request.body.decode('utf-8'))
         update_json = json.loads(request.body.decode('utf-8'))
         current_user = request.user
         old_name = update_json['old_name']
@@ -125,7 +126,7 @@ class RuleController(object):
         new_warning = update_json['new_warning']
         new_scope = update_json['new_scope']
         # new_type = update_json['new_type']
-        new_type = None
+        new_type = 'Gramatical'
         return self.update(current_user, old_name, new_name, new_pattern, new_warning, new_scope, new_type)
 
 
