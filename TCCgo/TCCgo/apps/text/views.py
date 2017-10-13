@@ -33,12 +33,18 @@ def create_text(request):
         return JsonResponse({'success':False}, safe=False)
 
 def delete_text(request):
-    """ Delete text from request"""
+    """ Delete text from request
+    200 -> delete success
+    300 -> delete error
+    501 -> user error
+    """
     status = TextController().request_delete(request)
     if status == 200:
-        return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+        return JsonResponse({'error':200}, safe=False)
+    elif status == 501:
+        return JsonResponse({'error':501}, safe=False)
     else:
-        return JsonResponse({'success':False}, safe=False)
+        return JsonResponse({'error':300}, safe=False)
 
 def get_all_texts(request):
     """ Return all texts"""

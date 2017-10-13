@@ -45,18 +45,22 @@ class TextController(object):
             return None
 
     def delete(self, user, title=None):
-        """delete a text from database"""
+        """delete a text from database
+        200 -> delete success
+        300 -> delete error
+        501 -> user error
+        """
         text = self.get(user=user, title=title)
         if title is not None:
             if(user == text.user):
                 text = TextController.get_all(user).filter(title=title)
                 if text:
                     text.delete()
-                    return True
+                    return 200
             else:
                 print("Um usuário não pode deletar o texto de outro")
                 return 501
-        return False
+        return 300
 
 
 
@@ -96,9 +100,14 @@ class TextController(object):
 
                     if not title:
                         raise ValueError('str titulo vazio')
+
                     success = self.delete(user, title)
-                    if success:
+                    if success == 200:
                         return 200
+                    elif success == 300:
+                        return 300;
+                    else:
+                        return 501;
                 except ValueError as e:
                     print ("str vazia")
         return 300

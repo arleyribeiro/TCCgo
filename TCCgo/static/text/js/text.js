@@ -21,27 +21,13 @@ app.controller("textController", function($scope, $http){
   };
 
 
-  function csrfSafeMethod(method) {
-    // Used on setting the token to send Ajax
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
   $(document).ready(function(){
     /* Setting up behavior of elements */
-    // Adding token to AJAX
-    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-    $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-          xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-      }
-    });
 
     $(document).on('click', '.remove-button',  function(e) {
       e.preventDefault();
       // Way to remove rules in the rule list page
-      
+
       var confirmation = confirm("Tem certeza que deseja deletar esse trabalho? ");
       if(!confirmation){  // Respondeu nao
         return false;
@@ -57,12 +43,20 @@ app.controller("textController", function($scope, $http){
       alert($scope.text.text_title+' ' +$scope.text.text_title.length);
 
       $http.post('/text/delete_text', $scope.text).then(function(data){
-        if(data.status == 501){
+        /*  data.error :
+            200 -> delete success
+            300 -> delete error
+            501 -> user error
+        */
+        if(data.error == 501){
           alert('Um usuário só pode deletar os próprios trabalhos.')
           return false;
+        }else if(data.status == 200){
+          alert('Trabalho deletado com sucesso!');
+          location.reload();
+        }else if(data.status == 300){
+            alert('Trabalho não pode ser deletado no momento!');
         }
-        alert('Trabalho deletado com sucesso!');
-        location.reload();
       });
     });
 
