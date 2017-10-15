@@ -1,7 +1,7 @@
 from django.db import models
 from TCCgo.apps.authentication.models import User
 
-class Text(models.Model):
+class Text(models.Model): # qual a PK disso ???
 	content = models.TextField(null=False, blank=False)
 	title = models.CharField(max_length=150, null=True, blank=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)

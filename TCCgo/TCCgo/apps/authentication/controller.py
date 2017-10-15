@@ -135,30 +135,25 @@ class UserController(object):
         return self.change_password(request, old_password, new_password, check_password)
 
     def authenticate(self, email=None, password=None):
-        print("sdfsdf " +email+ ' ' + password)
         try:
             user = User.objects.get(email=email)
-            print("cheguei " + user.password + ' ' + password)
             if password == user.password:
-              print('ok')
               return user
             else:
-              print('erro')
               return None
         except User.DoesNotExist:
-            print('asdfghj')
             return None
 
-    def request_login(self, request):
-        if request.method == 'POST':
-            email = request.POST.get('email','')
-            password = request.POST.get('password','')
-            user = UserController.authenticate(request, email=email, password=password)
-            if user is not None:
-                if user.is_active:
-                    auth_login(request,user)
-                    return 200 # Sucess
-                else:
-                    return 300 # Invalid
-            else:
-                return 404 # Error
+
+    def request_check_login(self, request):
+        user_json = json.loads(request.body.decode('utf-8'))
+        email = user_json['email']
+        password = user_json['password']
+        user = UserController.authenticate(request, email=email, password=password)
+
+        if user is not None:
+            if user.is_active:
+                auth_login(request,user)
+                return 200 # Sucess
+        else:
+            return 300 # Invalid

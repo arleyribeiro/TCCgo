@@ -1,28 +1,175 @@
 var app = angular.module("myApp", []);
 
-// Listing rules
 
 app.controller("RuleController", function($scope, $http){
+  /*
+    Controller for the list of rules shown
+  */
+  /* Setting up for post requests */
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  /* GETTING DATA FROM DATABASE WHEN PAGE LOADS */
+  // Listing all rules of a user as loading page
   $http.get('/rules/all_rules')
-  .then(function(data){
-    rules = JSON.parse(data.data);
-    $scope.rules = rules;
+  .then(function(response){
+    $scope.rules = response.data['rules'];
+  });
+
+  // listing all rule types inside radio buttons
+  $http.get('/rules/all_types')
+  .then(function(response){
+    $scope.types = response.data['types'];
   })
+
+  /* SETTING UP SEARCH BAR BEHAVIOR*/
+
+  // Filtering rules shown by search
+  $scope.searchText = "";
+  $scope.filterRules = function(){
+    $http.post('/rules/filter_rules',
+      {
+        'search_text' : $scope.searchText
+      }
+    ).then(function(response){
+      $scope.rules = response.data['filtered_rules'];
+      $scope.$digest();
+    });
+  };
+
+  /* SETTING UP EDIT MODE*/
+
+  // All rules start out of edit-mode
+  $.each($scope.rules, function(){
+    this.edit_mode = false;
+  });
+  // When hitting edit button, it becomes in edit mode
+  $scope.edit = function(index){
+    // Changing content of panel.
+    var prev_rule_name = $scope.rules[index].name; // Used to identify the rule being changed in the database
+    $scope.rules[index].edit_mode = true;
+
+    // Setting sending button behavior
+    $(document).on('click', '#save-edit-button', function(){
+      console.log("NOVO TIPO DE REGRA: " + $scope.rules[index].type);
+      $http.post('/rules/update_rule',
+        {
+          'old_name' : prev_rule_name,
+          'new_name' : $scope.rules[index].name,
+          'new_pattern' : $scope.rules[index].pattern,
+          'new_warning' : $scope.rules[index].warning,
+          'new_scope' : $scope.rules[index].scope,
+          // 'new_type' : $scope.rules[index].type
+        }
+      ).then(function(response){
+        $scope.rules[index].edit_mode = false;
+        if(response.data.status == 500){
+          alert("O nome de regra já existe no sistema.")
+          return false;
+        }
+        if(response.data.status == 501){
+          alert('Um usuário só pode atualizar as próprias regras.')
+          return false;
+        }
+      }, function(err){
+        console.log("ERROR: " + err.status);
+      });
+    })
+
+    // Setting edit cancel button behavior
+    $scope.cancel_edit = function(index){
+      $scope.rules[index].edit_mode = false;
+    }
+  }
+
+  /* SETTING UP ADD NEW RULE MODE */
+
+  // Start out of new rule mode
+  $scope.new_rule_mode = false;
+
+  // Function that starts the new rule mode
+  $scope.set_nr_mode = function(){
+    // Change mode
+    $scope.new_rule_mode = true;
+
+    // Form submitting
+    $(document).on('submit', '#new-rule-form', function(event){
+      /* Actions performed when send a new rule to be created */
+      // Prevent submitting
+      event.preventDefault();
+      // Ask user if he is sure about it
+      var confirmation = confirm("Tem certeza que deseja salvar a regra?");
+      if(!confirmation){
+        return false;
+      }
+      // Verify if there are empty fields and convert inputs into dict
+      var data_to_send = validate_rule_form($(this));
+      if(data_to_send === false){ // Some field is empty
+        alert("Todos os campos devem ser preenchidos");
+        return false;
+      }
+      else{ // All fields have something
+        // Change mode
+        $scope.new_rule_mode = false;
+        // Prepare form to be user again
+        $('#new-rule-form')[0].reset()
+        // Start sending the new rule to be created
+        $http.post($(this).attr('action'), data_to_send)
+          .then(function(response){
+            // Adding the new rule to the page
+            $scope.rules.push(response.data['new_rule']);
+          }, function(err){
+            console.log("ERROR: " + err.status);
+          });
+      }
+    });
+  }
+
+  // Cancel new rule mode
+  $scope.unset_nr_mode = function(){
+    $scope.new_rule_mode = false;
+  }
+
+  /* SETTING UP RULE DELETE */
+
+  $scope.delete = function(index){
+
+    // Ask for confirmation
+    var confirmation = confirm("Tem certeza que deseja deletar essa regra?");
+    if(!confirmation){  // Respondeu nao
+      return false;
+    }
+    // Get the rule name to delete
+    var delete_name = $scope.rules[index].name;
+    // Send request
+    $http.post('delete_rule', {'rule_name' : delete_name})
+      .then(function(response){
+          if(response.data.status == 501){
+            alert("Um usuário só pode deletar as próprias regras.")
+            return false;
+          }
+          // Remove from rules
+          $scope.rules.splice(index, 1);
+      }, function(err){
+        console.log("ERROR: " + err.status);
+      }
+    );
+  }
 });
 
-// Listing rule types
-app.controller("RuleTypeController", function($scope, $http){
-  $http.get('/rules/all_types')
-  .then(function(data){
-    types = JSON.parse(data.data)
-    $scope.types = types;
-  })
-})
+$(document).ready(function(){
+  /* Behaviors that I couldn't adapt to angular */
 
-/* Adding new Rules */
+  $('#name-input').change(function(){
+    /* Every time someone types a rule name, verify if it already exists in database*/
+    verify_name($(this).val(), $(this));
+  });
+});
 
-function verify_name(name){
-  // Given a name, verify if it exists in database. If exists, return true
+/* AUXILIARY FUNCTIONS*/
+
+function verify_name(name, element){
+  /* Given a name, verify if it exists in database. If exists, return true */
   $.ajax({
     url: 'verify_name',
     method: 'get',
@@ -31,11 +178,11 @@ function verify_name(name){
     },
     success: function(data){
       if(data.status){ // There is a rule with that name already
-        $("#name-input").css("border", "2px solid red");
-        $("#name-input").popover("show"/*{title: 'Nome já utilizado', content = 'Teste', trigger='hover'}*/);
+        element.css("border", "2px solid red");
+        element.popover("show"/*{title: 'Nome já utilizado', content = 'Teste', trigger='hover'}*/);
       } else {
-        $("#name-input").css("border", "none")
-        $("#name-input").popover("hide");
+        element.css("border", "none")
+        element.popover("hide");
       }
     },
     error: function(data){
@@ -45,7 +192,7 @@ function verify_name(name){
 }
 
 function validate_rule_form($form){
-  // Validate a form passed and return false if not valid, or a dict if valid
+  /* Validate a form passed and return false if not valid, or a dict if valid */
   var fields = $form.serializeArray();
   var response = {}; // Will have all the fields
   $.each(fields, function(i, field){ // Loop form inputs
@@ -58,47 +205,3 @@ function validate_rule_form($form){
   });
   return response;
 }
-
-$('#name-input').change(function(){
-  verify_name($(this).val());
-});
-
-$('#new-rule-form').submit(function(event){
-  // Prevent submitting
-  event.preventDefault();
-
-  // Ask user if he is sure about it
-  var confirmation = confirm("Tem certeza que deseja salvar a regra?");
-  if(!confirmation){
-    return false;
-  }
-
-  // Verify if there is empty fields and convert inputs into dict
-  var response = validate_rule_form($(this));
-  if(response === false){ // Some field is empty
-    alert("Todos os campos devem ser preenchidos");
-    return false;
-  }
-
-  // Start sending the new rule to be created
-  else{ // All fields have something
-    $.ajax({
-      url: $(this).attr('action'),
-      method : $(this).attr('method'),
-      data: response,
-      dataType: 'json',
-      success: function(response){
-        alert("Regra Criada com sucesso");
-        // As linhas abaixo não funcionam
-        // var rules_scope = angular.element($('#rules_container')).scope();
-        // rules_scope.$apply(function(){
-        //   rules_scope.rules.push(response.rule);
-        // });
-        // rules_scope.$digest();
-      },
-      error: function(response){
-        alert("Failure");
-      }
-    });
-  }
-});

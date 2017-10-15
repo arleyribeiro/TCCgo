@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block titleBlock %} TCC go | Trabalhos {% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row" >
+		<div class="col-md-8 col-md-offset-2" style="text-align: center">
+			<h3> Consulta de Trabalhos Submetidos </h3>
+			<br />
+		</div>
+	</div>
+
+	<div id="accordion" class="col-md-8 col-md-offset-2 panel-group" ng-controller="textController">
+		<!-- Search input  -->
+		<div class="input-group input-group col-md-8 col-md-offset-2">
+			<input class="form-control" type="text" name="text_search" ng-change="filterTexts()" ng-model="searchText" placeholder="Buscar Trabalho">
+			<span class="input-group-btn">
+				<button class="btn btn-primary" data-toggle="tooltip" title="Buscar"><span class="glyphicon glyphicon-search" ></span></button>
+			</span>
+		</div>
+		<br />
+
+		<!--Panels  -->
+	<form method="post" action="login" id="myForm" name="myForm" ng-submit="send($event)" validate>
+			{% csrf_token %}
+		<div class="panel panel-default" ng-repeat="text in texts">
+			<div class="panel-heading text" >
+					<span data-id="text.fields.title" ng-bind="text.fields.title" style="font-weight: bold"></span>
+					<div class="btn-group" style="float: right">
+						<a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Editar" ><span class="glyphicon glyphicon-pencil" ></span></a>
+						<button type="button" class="btn btn-primary btn-xs remove-button" data-toggle="tooltip" title="Deletar"><span class="glyphicon glyphicon-trash" ></span></button>
+					</div>
+				</div	>
+				<div class="panel-body">
+					<span ng-bind="text.fields.content"></span>
+				</div>
+		</div>
+	</div>
+</form>
+
+	{% endblock %}
+
+	{% block script %}
+	<script src="/static/text/js/text.js"></script>
+	{% endblock %}

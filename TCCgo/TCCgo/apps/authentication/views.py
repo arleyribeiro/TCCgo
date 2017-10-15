@@ -62,14 +62,19 @@ def change_password(request):
     response = user_controller.request_change_password(request)
     return JsonResponse(response, safe=False)
 
+
 def login(request):
-    status = UserController().request_login(request)
+    return render(request, 'login.html')
+
+def check_login(request):
+
+    user_controller = UserController();
+    status = user_controller.request_check_login(request)
+
     if(status == 200):
-        return HttpResponseRedirect("/")
-    elif(status == 300):
-        return HttpResponse('Invalid Login'+' '+email+' '+password +' <p> não funciona para rute, a documentação é inimiga da perfeicao')
+        return JsonResponse({'success':True, 'url':'http://localhost:8000'}, safe=False)
     else:
-        return render(request,'login.html')
+        return JsonResponse({'success':False,'url':[]}, safe=False)
 
 def logout(request):
 	auth_logout(request)

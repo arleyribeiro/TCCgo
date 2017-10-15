@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
-{% block titleBlock %} FAQ | TCC go {% endblock %}
+{% block titleBlock %} TCC go | FAQ {% endblock %}
 
 {% block content %}
 
 
 <div class="container">
-		<h3>Perguntas Frequentes </h3>
-    <br />
-
+	<div class="row" >
+		<div class="col-md-8 col-md-offset-2" style="text-align: center">
+			<h3>Perguntas Frequentes </h3>
+    	<br />
+		</div>
+	</div>
 		<div id="questions_container" class="col-md-8 col-md-offset-2" ng-controller="questionController">
 
 			<div class="panel panel-default" ng-repeat="question in questions">
@@ -23,73 +26,6 @@
 							</div>
 					</div>
 			</div>
-  <!--
-			<div class="panel panel-default">
-					<div class="panel-heading">
-							<h4 class="panel-title">
-									<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse2">O que é o TCCgo?</a>
-							</h4>
-					</div>
-					<div id="collapse2" class="panel-collapse collapse in">
-							<div class="panel-body">
-									O TCCgo é uma aplicação que visa facilitar e otimizar a correção de TCC's, Trabalhos de Conclusão de Curso, por meio de auxílio na identificação de inconsistências.
-							</div>
-					</div>
-			</div>
-
-   <div class="panel-group" id="accordion">
-    		<div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse40">O que é o TCCgo?</a>
-                </h4>
-            </div>
-            <div id="collapse40" class="panel-collapse collapse in">
-                <div class="panel-body">
-                    O TCCgo é uma aplicação que visa facilitar e otimizar a correção de TCC's, Trabalhos de Conclusão de Curso, por meio de auxílio na identificação de inconsistências.
-                </div>
-            </div>
-        </div>
-
-				<div class="panel panel-default">
-						<div class="panel-heading">
-								<h4 class="panel-title">
-										<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse2">Para quem o TCCgo foi desenvolvido?</a>
-								</h4>
-						</div>
-						<div id="collapse2" class="panel-collapse collapse in">
-								<div class="panel-body">
-										O TCCgo foi desenvolvido para alunos e orientadores que queiram verificar inconsistências no TCC.
-								</div>
-						</div>
-				</div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse3">Preciso criar conta para submeter arquivo?</a>
-                </h4>
-            </div>
-            <div id="collapse3" class="panel-collapse collapse in">
-                <div class="panel-body">
-                    Sim, para submeter arquivo é necessário criar conta.
-                </div>
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse4">Como o TCCgo analisa os textos submetidos?</a>
-                </h4>
-            </div>
-            <div id="collapse4" class="panel-collapse collapse in">
-                <div class="panel-body">
-                    O TCCgo identifica inconsistências por meio de regras. As regras são expressões regulares usadas para identificar padrões, palavras, e construções frasais inadequadas. As regras são mantidas em um banco de dados, e podem ser cadastradas pela comunidade, professores e alunos.
-                </div>
-            </div>
-        </div>
-  	</div> -->
 </div>
 
 

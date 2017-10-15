@@ -6,6 +6,17 @@
   color: black;
 }
 
+#save-button,
+#save-edit-button,
+#cancel-button,
+#cancel-edit-button,
+.remove-button,
+#edit-button{
+  padding: 20px;
+}
+#search-container, #new-rule-container{
+  margin-bottom: 20px;
+}
 .popover-title, .popover-content{
   color: black;
 }
