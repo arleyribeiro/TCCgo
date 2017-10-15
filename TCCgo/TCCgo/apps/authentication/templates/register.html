@@ -28,27 +28,27 @@
           <label for="username" class="col-md-2 col-form-label">Usuário</label>
           <div class="col-md-10">
             <input type="text" class="form-control" id="username" name="username" ng-model="user.username" required placeholder="ana">
-            <span style="color:red" ng-show="myForm.username.$touched && myForm.username.$invalid">
+            <span style="color:red" ng-show="myForm.username.$invalid">
               <span ng-show="myForm.username.$error.required">Campo Obrigatório</span>
-            </span>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="email" class="col-md-2 col-form-label">E-mail</label>
-          <div class="col-md-10">
-            <input type="email" class="form-control" id="email" name="email" ng-model="user.email" required  placeholder="ana@email.com">
-            <span style="color:red" ng-show="myForm.email.$touched && myForm.email.$invalid">
-              <span ng-show="myForm.email.$error.required">Campo Obrigatório</span>
-              <span ng-show="myForm.email.$error.email">E-mail inválido</span>
             </span>
           </div>
         </div>
         {% if not user.is_authenticated %}
         <div class="form-group row">
+          <label for="email" class="col-md-2 col-form-label">E-mail</label>
+          <div class="col-md-10">
+            <input type="email" class="form-control" id="email" name="email" ng-model="user.email" required  placeholder="ana@email.com">
+            <span style="color:red" ng-show="myForm.email.$invalid">
+              <span ng-show="myForm.email.$error.required">Campo Obrigatório</span>
+              <span ng-show="myForm.email.$error.email">E-mail inválido</span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
           <label for="password" class="col-md-2 col-form-label">Senha</label>
           <div class="col-md-10">
             <input type="password" class="form-control" id="password" name="password" ng-model="user.password" ng-minlength="6" required placeholder="********">
-            <span style="color:red" ng-show="myForm.password.$touched && myForm.password.$invalid">
+            <span style="color:red" ng-show="myForm.password.$invalid">
               <span ng-show="myForm.password.$error.required">Campo Obrigatório</span>
               <span ng-show="myForm.password.$error.minlength">Senha deve conter mais de 6 caracteres</span>
             </span>
@@ -58,7 +58,7 @@
           <label for="check" class="col-md-2 col-form-label">Confirmação de Senha</label>
           <div class="col-md-10">
             <input type="password" class="form-control" id="check" name="check" ng-model="user.check" ng-focus="check_password()" required placeholder="********">
-            <span style="color:red" ng-show="myForm.check.$touched && dismatch_pass">
+            <span style="color:red" ng-show="dismatch_pass">
               <span ng-show="dismatch_pass">Senhas não batem</span>
             </span>
           </div>
@@ -94,8 +94,7 @@
               <button id="bt_update" type="button" ng-click="update_user()" class="btn btn-primary">Atualizar</button>
               {% endif %}
               {% if not user.is_authenticated %}
-              <button ng-disabled="myForm.username.$invalid || myForm.email.$invalid || myForm.password.$invalid || myForm.check.$invalid || dismatch_pass
-              " type="submit" class="btn btn-primary">Registrar</button>
+              <button type="submit" class="btn btn-primary">Registrar</button>
               {% endif %}
             </div>
           </div>
@@ -130,9 +129,11 @@ app.controller("registerController", function($scope, $http){
 
   $scope.send = function (e) {
       e.preventDefault();
-
-      response = confirm("Tem certeza que deseja registrar usuário?");
-      if(response){
+      if($scope.user.username == '' || $scope.user.email == '' || !$scope.user.username.search('@') ||
+      !$scope.user.password || $scope.user.password.length < 6 || $scope.user.password != $scope.user.check){
+        alert("Preencha todos os campos adequadamente antes de submter o formulário!");
+      }
+      else{
         $http.post('/auth/check_unique_email', {email:$scope.user.email}).then(function(response){
 
           if(response.data == true)
@@ -168,22 +169,19 @@ app.controller("registerController", function($scope, $http){
   });
 
   $scope.update_user = function(){
-    response = confirm("Tem certeza que deseja atualizar os dados de usuário?");
-    if(response){
-      $http.post(
-       '/auth/register/update_user',
-       $scope.user
-     ).then(function(data){
-       if(data != false)
-       {
-         var update_user = data.data;
-         $scope.user.username = update_user.username;
-         $scope.user.email = update_user.email;
-         $scope.user.interest = update_user.interest;
-         alert("Usuário atualizado com sucesso!");
-       }
-     });
-    }
+    $http.post(
+     '/auth/register/update_user',
+     $scope.user
+   ).then(function(data){
+     if(data != false)
+     {
+       var update_user = data.data;
+       $scope.user.username = update_user.username;
+       $scope.user.email = update_user.email;
+       $scope.user.interest = update_user.interest;
+       alert("Usuário atualizado com sucesso!");
+     }
+   });
   }
 
   $scope.delete_user = function(){

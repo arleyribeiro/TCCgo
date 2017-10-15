@@ -19,17 +19,19 @@ class UserController(object):
         except User.DoesNotExist:
             current_user = None
         if current_user == None and checked:
-            new_user = User(username = username, email = email, password = password, interest = interest, is_staff = False)
-            new_user.save()
-            return 200
+            if username.strip() and email.strip() and '@' in email:
+                new_user = User(username = username, email = email, password = password, interest = interest, is_staff = False)
+                new_user.save()
+                return 200
+            else:
+                return 300
         else:
             return 300
 
-    def update(self, session_user_id, username, email, interest):
+    def update(self, session_user_id, username, interest):
         current_user = User.objects.get(pk=session_user_id)
         if current_user != None:
             current_user.username = username
-            current_user.email = email
             current_user.interest = interest
             current_user.save()
         return current_user
@@ -58,10 +60,12 @@ class UserController(object):
         if session_user != None and session_user.is_authenticated:
             if self.authenticate(session_user.email, old_password) != None:
                 if new_password == check_password:
-                    session_user.password = new_password
-                    session_user.save()
-                    auth_login(request,session_user)
-                    return {'success': True, 'msg': 'Nova senha registrada com sucesso!'};
+                    if len(new_password) > 5:
+                        session_user.password = new_password
+                        session_user.save()
+                        auth_login(request,session_user)
+                        return {'success': True, 'msg': 'Nova senha registrada com sucesso!'};
+                    else: return {'success': False, 'msg': 'A senha nova possui menos de 6 caracteres!'};
                 else:
                     return {'success': False, 'msg': 'A senha nova e sua confirmação não batem!'};
             else:
@@ -85,10 +89,9 @@ class UserController(object):
                 session_user_id = session_user.id
                 user_json = json.loads(request.body.decode('utf-8'))
                 username = user_json['username']
-                email = user_json['email']
                 interest = user_json['interest']
-                updated_user =  self.update(session_user_id, username, email, interest)
-                dict_updated_user = model_to_dict(updated_user, fields = ["username", "email", "interest"])
+                updated_user =  self.update(session_user_id, username, interest)
+                dict_updated_user = model_to_dict(updated_user, fields = ["username", "interest"])
                 return dict_updated_user
             else:
                 return False
