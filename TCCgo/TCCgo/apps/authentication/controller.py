@@ -80,7 +80,13 @@ class UserController(object):
         password = request.POST['password']
         check = request.POST['check']
         interest = request.POST['interest']
-        return self.create(username, email, password, check, interest)
+        status = self.create(username, email, password, check, interest)
+        if status == 200:
+            user = UserController.authenticate(request, email=email, password=password)
+            if user is not None:
+                if user.is_active:
+                    auth_login(request,user)
+        return status
 
     def request_update(self, request):
         if request.user.is_authenticated :

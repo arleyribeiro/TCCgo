@@ -109,7 +109,7 @@
 {% block script %}
 <script type="text/javascript">
 var app = angular.module("myApp", []);
-app.controller("registerController", function($scope, $http){
+app.controller("registerController", function($scope, $http, $window){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
 
@@ -180,6 +180,7 @@ app.controller("registerController", function($scope, $http){
        $scope.user.email = update_user.email;
        $scope.user.interest = update_user.interest;
        alert("Usuário atualizado com sucesso!");
+       $window.location.href = '/';
      }
    });
   }
