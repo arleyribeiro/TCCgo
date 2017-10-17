@@ -14,59 +14,134 @@
     </div>
   </div>
 
-  <!-- List of rules container -->
-  <div ng-controller=RuleController>
-    <div class="row">
-      <div id="search-container" class="col-md-10 col-md-offset-1">
-        <!-- Search bar -->
-        <div class="input-group input-group-lg">
-          <input class="form-control" type="text" name="rule_search" ng-change="filterRules()" ng-model="searchText">
-          <span class="input-group-btn">
-            <button class="btn btn-primary">Buscar</button>
-          </span>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#publicas">Públicas</a></li>
+    <li><a data-toggle="tab" href="#privadas">Privadas</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="publicas" class="tab-pane fade in active">
+      <!-- List of rules container -->
+      <div ng-controller=RuleController>
+        <div class="row">
+          <div id="search-container" class="col-md-10 col-md-offset-1">
+            <!-- Search bar -->
+            <div class="input-group input-group-lg">
+              <input class="form-control" type="text" name="rule_search" ng-change="filterRules()" ng-model="searchText">
+              <span class="input-group-btn">
+                <button class="btn btn-primary">Buscar</button>
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div id="new-rule-container" class="col-md-10 col-md-offset-1">
-        <!-- Button to show up form to add new rule -->
-        <div class="col-md-8 col-md-offset-4">
-          <button ng-hide="new_rule_mode" class="btn btn-success" id="add-new-rule-button" ng-click="set_nr_mode()"><span class="glyphicon glyphicon-plus"></span>Nova Regra</button>
+        <div class="row">
+          <div id="new-rule-container" class="col-md-10 col-md-offset-1">
+            <!-- Button to show up form to add new rule -->
+            <div class="col-md-8 col-md-offset-4">
+              <button ng-hide="new_rule_mode" class="btn btn-success" id="add-new-rule-button" ng-click="set_nr_mode()"><span class="glyphicon glyphicon-plus"></span>Nova Regra</button>
+            </div>
+            <!-- Form to add a new rule -->
+            <div class="col-md-12">
+              <form id="new-rule-form" ng-show="new_rule_mode" method="post" action="{% url 'rules:create_rule' %}" id="new-rule-form">
+                {% csrf_token %}
+                <div class="panel panel-primary" >
+                  <div class="panel-heading">
+                    <label for="rule_name">Nome: </label>
+                    <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste">
+                  </div>
+                  <div class="panel-body">
+                    <div class="col-md-3 form-group">
+                      <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
+                      <input class="form-control" type="text" name="rule_pattern"><br>
+                    </div>
+                    <div class="col-md-2">
+                      <label for="rule_scope">Escopo: </label><br>
+                      <input type="radio" name="rule_scope" value="PU">Public<br>
+                      <input type="radio" name="rule_scope" value="PV">Private
+                    </div>
+                    <div class="col-md-2">
+                      <label for="rule_type">Tipo: </label>
+                      {% verbatim %}
+                      <!-- <div ng-repeat="type in types">
+                        <input type="radio" name="rule_type" ng-value="type.type">{{ type.type }}
+                      </div> -->
+                      <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType">
+                      </select>
+                      {% endverbatim %}
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                      <br><br>
+                      <button type="submit" id="save-button" class="btn btn-success">Salvar</button>
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                      <br><br>
+                      <button type="button" id="cancel-button" class="btn btn-danger" ng-click="unset_nr_mode()">Cancelar</button>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="rule_warning">Aviso: </label>
+                      <textarea class="form-control" rows="5"   name="rule_warning"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-        <!-- Form to add a new rule -->
-        <div class="col-md-12">
-          <form id="new-rule-form" ng-show="new_rule_mode" method="post" action="{% url 'rules:create_rule' %}" id="new-rule-form">
-            {% csrf_token %}
-            <div class="panel panel-primary" >
-              <div class="panel-heading">
-                <label for="rule_name">Nome: </label>
-                <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste">
+        <div class="row">
+          <div class="col-md-10 col-md-offset-1">
+
+            <!-- List of rules -->
+            <div  ng-hide="rule.scope == 'PV'" class="panel panel-primary" ng-repeat="rule in rules">
+              <!-- Show rule data out of the edit mode-->
+              <div class="panel-heading" ng-bind="rule.name" ng-hide="rule.edit_mode"></div>
+              <div class="panel-body" ng-hide="rule.edit_mode">
+                <div class="col-md-6">
+                  <p>Padrão: <span ng-bind="rule.pattern"></span></p>
+                  <p>Aviso: <span ng-bind="rule.warning"></span></p>
+                </div>
+                <div class="col-md-1 col-md-offset-2">
+                  <button id="edit-button" type="button" class="btn btn-primary" ng-click="edit($index)">Editar</button>
+                </div>
+                <div class="col-md-1 col-md-offset-1">
+                  <button type="button" class="btn btn-danger remove-button" ng-click="delete($index)">Remover</button>
+                </div>
               </div>
-              <div class="panel-body">
+              <!-- When click edit (start edit mode) -->
+              <div class="panel-heading" ng-show="rule.edit_mode">
+                <label for="rule_name">Nome: </label>
+                <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste" ng-model="rule.name">
+              </div>
+              <div class="panel-body" ng-show="rule.edit_mode">
                 <div class="col-md-3 form-group">
                   <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
-                  <input class="form-control" type="text" name="rule_pattern"><br>
+                  <input class="form-control" type="text" name="rule_pattern" ng-model="rule.pattern"><br>
                 </div>
                 <div class="col-md-2">
                   <label for="rule_scope">Escopo: </label><br>
-                  <input type="radio" name="rule_scope" value="PU">Public<br>
-                  <input type="radio" name="rule_scope" value="PV">Private
+                  <input type="radio" name="rule_scope" value="PU" ng-model="rule.scope">Público<br>
+                  <input type="radio" name="rule_scope" value="PV" ng-model="rule.scope">Privado
                 </div>
                 <div class="col-md-2">
-                  <label for="rule_type">Tipo: </label>
                   {% verbatim %}
-                  <div ng-repeat="type in types"> <!-- Listing rule types in the database -->
-                    <input type="radio" name="rule_type" ng-value="type.type">{{ type.type }}
-                  </div>
+                  <!-- <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Tipo<span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                      <li ng-click="getSelectedItem(type)" value={{ type.type }} ng-repeat="type in types">
+                        <a href="javascript:void(0)" value="{{ type.type }}">{{ type.type }}</a>
+                      </li>
+                    </ul>
+                  </div> -->
+                  <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType" ng-change="setRuleType($index, selectedType)">
+                  </select>
                   {% endverbatim %}
                 </div>
                 <div class="col-md-1 col-md-offset-1">
-                  <br><br>
-                  <button type="submit" id="save-button" class="btn btn-success">Salvar</button>
+                  <br>
+                  <button type="submit" id="save-edit-button" class="btn btn-success">Salvar</button>
                 </div>
                 <div class="col-md-1 col-md-offset-1">
-                  <br><br>
-                  <button type="button" id="cancel-button" class="btn btn-danger" ng-click="unset_nr_mode()">Cancelar</button>
+                  <br>
+                  <button type="button" id="cancel-edit-button" ng-click="cancel_edit($index)" class="btn btn-danger">Cancelar</button>
                 </div>
                 <div class="col-md-12">
                   <label for="rule_warning">Aviso: </label>
@@ -74,69 +149,141 @@
                 </div>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-10 col-md-offset-1">
 
-        <!-- List of rules -->
-        <div class="panel panel-primary" ng-repeat="rule in rules">
-          <!-- Show rule data out of the edit mode-->
-          <div class="panel-heading" ng-bind="rule.name" ng-hide="rule.edit_mode"></div>
-          <div class="panel-body" ng-hide="rule.edit_mode">
-            <div class="col-md-6">
-              <p>Padrão: <span ng-bind="rule.pattern"></span></p>
-              <p>Aviso: <span ng-bind="rule.warning"></span></p>
-            </div>
-            <div class="col-md-1 col-md-offset-2">
-              <button id="edit-button" type="button" class="btn btn-primary" ng-click="edit($index)">Editar</button>
-            </div>
-            <div class="col-md-1 col-md-offset-1">
-              <button type="button" class="btn btn-danger remove-button" ng-click="delete($index)">Remover</button>
+
+    <!-- User Tab -->
+    <div id="privadas" class="tab-pane fade">
+      <!-- List of rules container -->
+      <div ng-controller=RuleController>
+        <div class="row">
+          <div id="search-container" class="col-md-10 col-md-offset-1">
+            <!-- Search bar -->
+            <div class="input-group input-group-lg">
+              <input class="form-control" type="text" name="rule_search" ng-change="filterRules()" ng-model="searchText">
+              <span class="input-group-btn">
+                <button class="btn btn-primary">Buscar</button>
+              </span>
             </div>
           </div>
-          <!-- When click edit (start edit mode) -->
-          <div class="panel-heading" ng-show="rule.edit_mode">
-            <label for="rule_name">Nome: </label>
-            <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste" ng-model="rule.name">
-          </div>
-          <div class="panel-body" ng-show="rule.edit_mode">
-            <div class="col-md-3 form-group">
-              <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
-              <input class="form-control" type="text" name="rule_pattern" ng-model="rule.pattern"><br>
+        </div>
+        <div class="row">
+          <div id="new-rule-container" class="col-md-10 col-md-offset-1">
+            <!-- Button to show up form to add new rule -->
+            <div class="col-md-8 col-md-offset-4">
+              <button ng-hide="new_rule_mode" class="btn btn-success" id="add-new-rule-button" ng-click="set_nr_mode()"><span class="glyphicon glyphicon-plus"></span>Nova Regra</button>
             </div>
-            <div class="col-md-2">
-              <label for="rule_scope">Escopo: </label><br>
-              <input type="radio" name="rule_scope" value="PU" ng-model="rule.scope">Público<br>
-              <input type="radio" name="rule_scope" value="PV" ng-model="rule.scope">Privado
-            </div>
-            <div class="col-md-2">
-              {% verbatim %}
-              <!-- <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Tipo<span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                  <li ng-click="getSelectedItem(type)" value={{ type.type }} ng-repeat="type in types">
-                    <a href="javascript:void(0)" value="{{ type.type }}">{{ type.type }}</a>
-                  </li>
-                </ul>
-              </div> -->
-              <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType" ng-change="setRuleType($index, selectedType)">
-              </select>
-              {% endverbatim %}
-            </div>
-            <div class="col-md-1 col-md-offset-1">
-              <br>
-              <button type="submit" id="save-edit-button" class="btn btn-success">Salvar</button>
-            </div>
-            <div class="col-md-1 col-md-offset-1">
-              <br>
-              <button type="button" id="cancel-edit-button" ng-click="cancel_edit($index)" class="btn btn-danger">Cancelar</button>
-            </div>
+            <!-- Form to add a new rule -->
             <div class="col-md-12">
-              <label for="rule_warning">Aviso: </label>
-              <textarea class="form-control" rows="5"   name="rule_warning"></textarea>
+              <form id="new-rule-form" ng-show="new_rule_mode" method="post" action="{% url 'rules:create_rule' %}" id="new-rule-form">
+                {% csrf_token %}
+                <div class="panel panel-primary" >
+                  <div class="panel-heading">
+                    <label for="rule_name">Nome: </label>
+                    <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste">
+                  </div>
+                  <div class="panel-body">
+                    <div class="col-md-3 form-group">
+                      <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
+                      <input class="form-control" type="text" name="rule_pattern"><br>
+                    </div>
+                    <div class="col-md-2">
+                      <label for="rule_scope">Escopo: </label><br>
+                      <input type="radio" name="rule_scope" value="PU">Public<br>
+                      <input type="radio" name="rule_scope" value="PV">Private
+                    </div>
+                    <div class="col-md-2">
+                      <label for="rule_type">Tipo: </label>
+                      {% verbatim %}
+                      <!-- <div ng-repeat="type in types">
+                        <input type="radio" name="rule_type" ng-value="type.type">{{ type.type }}
+                      </div> -->
+                      <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType">
+                      </select>
+                      {% endverbatim %}
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                      <br><br>
+                      <button type="submit" id="save-button" class="btn btn-success">Salvar</button>
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                      <br><br>
+                      <button type="button" id="cancel-button" class="btn btn-danger" ng-click="unset_nr_mode()">Cancelar</button>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="rule_warning">Aviso: </label>
+                      <textarea class="form-control" rows="5"   name="rule_warning"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-10 col-md-offset-1">
+
+            <!-- List of rules -->
+            <div ng-hide="rule.scope == 'PU'" class="panel panel-primary" ng-repeat="rule in rules">
+              <!-- Show rule data out of the edit mode-->
+              <div class="panel-heading" ng-bind="rule.name" ng-hide="rule.edit_mode"></div>
+              <div class="panel-body" ng-hide="rule.edit_mode">
+                <div class="col-md-6">
+                  <p>Padrão: <span ng-bind="rule.pattern"></span></p>
+                  <p>Aviso: <span ng-bind="rule.warning"></span></p>
+                </div>
+                <div class="col-md-1 col-md-offset-2">
+                  <button id="edit-button" type="button" class="btn btn-primary" ng-click="edit($index)">Editar</button>
+                </div>
+                <div class="col-md-1 col-md-offset-1">
+                  <button type="button" class="btn btn-danger remove-button" ng-click="delete($index)">Remover</button>
+                </div>
+              </div>
+              <!-- When click edit (start edit mode) -->
+              <div class="panel-heading" ng-show="rule.edit_mode">
+                <label for="rule_name">Nome: </label>
+                <input id="name-input" type="text" name="rule_name" data-toggle="popover" data-title="Nome repetido" data-toggle="Teste" ng-model="rule.name">
+              </div>
+              <div class="panel-body" ng-show="rule.edit_mode">
+                <div class="col-md-3 form-group">
+                  <label for="rule_pattern">Padrão: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Digite um Regex"></span></label>
+                  <input class="form-control" type="text" name="rule_pattern" ng-model="rule.pattern"><br>
+                </div>
+                <div class="col-md-2">
+                  <label for="rule_scope">Escopo: </label><br>
+                  <input type="radio" name="rule_scope" value="PU" ng-model="rule.scope">Público<br>
+                  <input type="radio" name="rule_scope" value="PV" ng-model="rule.scope">Privado
+                </div>
+                <div class="col-md-2">
+                  {% verbatim %}
+                  <!-- <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Tipo<span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                      <li ng-click="getSelectedItem(type)" value={{ type.type }} ng-repeat="type in types">
+                        <a href="javascript:void(0)" value="{{ type.type }}">{{ type.type }}</a>
+                      </li>
+                    </ul>
+                  </div> -->
+                  <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType" ng-change="setRuleType($index, selectedType)">
+                  </select>
+                  {% endverbatim %}
+                </div>
+                <div class="col-md-1 col-md-offset-1">
+                  <br>
+                  <button type="submit" id="save-edit-button" class="btn btn-success">Salvar</button>
+                </div>
+                <div class="col-md-1 col-md-offset-1">
+                  <br>
+                  <button type="button" id="cancel-edit-button" ng-click="cancel_edit($index)" class="btn btn-danger">Cancelar</button>
+                </div>
+                <div class="col-md-12">
+                  <label for="rule_warning">Aviso: </label>
+                  <textarea class="form-control" rows="5"   name="rule_warning"></textarea>
+                </div>
+              </div>
             </div>
           </div>
         </div>

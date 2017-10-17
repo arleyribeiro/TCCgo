@@ -108,12 +108,13 @@ app.controller("RuleController", function($scope, $http){
       }
       // Verify if there are empty fields and convert inputs into dict
       var data_to_send = validate_rule_form($(this));
-      if(data_to_send === false){ // Some field is empty
+      if(data_to_send === false || $scope.selectedType == undefined){ // Some field is empty
         alert("Todos os campos devem ser preenchidos");
         return false;
       }
       else{ // All fields have something
         // Change mode
+        data_to_send['rule_type'] = $scope.selectedType.type;
         $scope.new_rule_mode = false;
         // Prepare form to be user again
         $('#new-rule-form')[0].reset()
@@ -134,10 +135,9 @@ app.controller("RuleController", function($scope, $http){
     $scope.new_rule_mode = false;
   }
 
-  // Get value from types dropdown
+  // Get value from types select box
   $scope.setRuleType = function(index, item){
     $scope.rules[index].type = item.type;
-    console.log("Regra numero " + index + " com o tipo " + item.type);
   }
 
   /* SETTING UP RULE DELETE */
@@ -179,7 +179,10 @@ $(document).ready(function(){
 /* AUXILIARY FUNCTIONS*/
 
 function verify_name(name, element){
-  /* Given a name, verify if it exists in database. If exists, return true */
+  /* Given a name, verify if it exists in database. If exists, return true
+     Obs: This function can't retrieve rule type beacuse it's in a select box of angular. This case is treated after
+  */
+
   $.ajax({
     url: 'verify_name',
     method: 'get',
