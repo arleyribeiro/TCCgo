@@ -125,8 +125,7 @@ class RuleController(object):
         new_pattern = update_json['new_pattern']
         new_warning = update_json['new_warning']
         new_scope = update_json['new_scope']
-        # new_type = update_json['new_type']
-        new_type = 'Gramatical'
+        new_type = update_json['new_type']
         return self.update(current_user, old_name, new_name, new_pattern, new_warning, new_scope, new_type)
 
 

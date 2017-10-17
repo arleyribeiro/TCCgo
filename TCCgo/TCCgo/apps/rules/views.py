@@ -32,6 +32,7 @@ def get_all_types(request):
 
 def filter_rules(request):
     """ Return a filtered by name set of rules"""
+    print(request.body.decode('utf-8'))
     controller = RuleController()
     query_set = controller.filter_with_request(request)
     response = {}
@@ -40,6 +41,7 @@ def filter_rules(request):
 
 def create_rule(request):
     """ Create a rule, save it to the database and return it to javascript """
+    print(request.body.decode('utf-8'))
     controller = RuleController()
     rule = controller.create_with_request(request)
     response = {}

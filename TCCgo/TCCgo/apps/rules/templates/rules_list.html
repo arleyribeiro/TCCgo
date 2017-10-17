@@ -113,11 +113,17 @@
               <input type="radio" name="rule_scope" value="PV" ng-model="rule.scope">Privado
             </div>
             <div class="col-md-2">
-              <label for="rule_type">Tipo: </label>
               {% verbatim %}
-              <div ng-repeat="type in types"> <!-- Listing rule types in the database -->
-                <input type="radio" name="rule_type" ng-model="rule.type">{{ type.type }}
-              </div>
+              <!-- <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Tipo<span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                  <li ng-click="getSelectedItem(type)" value={{ type.type }} ng-repeat="type in types">
+                    <a href="javascript:void(0)" value="{{ type.type }}">{{ type.type }}</a>
+                  </li>
+                </ul>
+              </div> -->
+              <select type="text" class="form-control" placeholder="Tipo" ng-options="type.type for type in types" ng-model="selectedType" ng-change="setRuleType($index, selectedType)">
+              </select>
               {% endverbatim %}
             </div>
             <div class="col-md-1 col-md-offset-1">

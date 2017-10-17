@@ -48,6 +48,10 @@ app.controller("RuleController", function($scope, $http){
     // Changing content of panel.
     var prev_rule_name = $scope.rules[index].name; // Used to identify the rule being changed in the database
     $scope.rules[index].edit_mode = true;
+    if($scope.rules[index] == undefined){
+      alert("Preencha o tipo da regra");
+      return false;
+    }
 
     // Setting sending button behavior
     $(document).on('click', '#save-edit-button', function(){
@@ -59,7 +63,7 @@ app.controller("RuleController", function($scope, $http){
           'new_pattern' : $scope.rules[index].pattern,
           'new_warning' : $scope.rules[index].warning,
           'new_scope' : $scope.rules[index].scope,
-          // 'new_type' : $scope.rules[index].type
+          'new_type' : $scope.rules[index].type
         }
       ).then(function(response){
         $scope.rules[index].edit_mode = false;
@@ -128,6 +132,12 @@ app.controller("RuleController", function($scope, $http){
   // Cancel new rule mode
   $scope.unset_nr_mode = function(){
     $scope.new_rule_mode = false;
+  }
+
+  // Get value from types dropdown
+  $scope.setRuleType = function(index, item){
+    $scope.rules[index].type = item.type;
+    console.log("Regra numero " + index + " com o tipo " + item.type);
   }
 
   /* SETTING UP RULE DELETE */
