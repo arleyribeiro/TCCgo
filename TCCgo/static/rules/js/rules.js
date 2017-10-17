@@ -75,6 +75,7 @@ app.controller("RuleController", function($scope, $http){
           alert('Um usuário só pode atualizar as próprias regras.')
           return false;
         }
+        alert("Regra alterada com sucesso");
       }, function(err){
         console.log("ERROR: " + err.status);
       });
@@ -102,10 +103,10 @@ app.controller("RuleController", function($scope, $http){
       // Prevent submitting
       event.preventDefault();
       // Ask user if he is sure about it
-      var confirmation = confirm("Tem certeza que deseja salvar a regra?");
-      if(!confirmation){
-        return false;
-      }
+      // var confirmation = confirm("Tem certeza que deseja salvar a regra?");
+      // if(!confirmation){
+      //   return false;
+      // }
       // Verify if there are empty fields and convert inputs into dict
       var data_to_send = validate_rule_form($(this));
       if(data_to_send === false || $scope.selectedType == undefined){ // Some field is empty
@@ -123,6 +124,7 @@ app.controller("RuleController", function($scope, $http){
           .then(function(response){
             // Adding the new rule to the page
             $scope.rules.push(response.data['new_rule']);
+            alert("Regra criada com sucesso.")
           }, function(err){
             console.log("ERROR: " + err.status);
           });
@@ -160,6 +162,7 @@ app.controller("RuleController", function($scope, $http){
           }
           // Remove from rules
           $scope.rules.splice(index, 1);
+          alert("Regra deletada com sucesso.")
       }, function(err){
         console.log("ERROR: " + err.status);
       }
