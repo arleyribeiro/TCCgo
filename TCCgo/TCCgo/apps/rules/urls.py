@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.rules_list, name='rules_list'), # List all the rules of the user
+    url(r'^$', login_required(views.rules_list), name='rules_list'), # List all the rules of the user
 
     # login required ->
     # Ajax requests urls
