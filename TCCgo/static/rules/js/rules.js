@@ -113,6 +113,10 @@ app.controller("RuleController", function($scope, $http){
         alert("Todos os campos devem ser preenchidos");
         return false;
       }
+      if(repeated_name){
+        alert("Nome repetido");
+        return false;
+      }
       else{ // All fields have something
         // Change mode
         data_to_send['rule_type'] = $scope.selectedType.type;
@@ -181,6 +185,7 @@ $(document).ready(function(){
 
 /* AUXILIARY FUNCTIONS*/
 
+var repeated_name = false;
 function verify_name(name, element){
   /* Given a name, verify if it exists in database. If exists, return true
      Obs: This function can't retrieve rule type beacuse it's in a select box of angular. This case is treated after
@@ -196,9 +201,11 @@ function verify_name(name, element){
       if(data.status){ // There is a rule with that name already
         element.css("border", "2px solid red");
         element.popover("show"/*{title: 'Nome já utilizado', content = 'Teste', trigger='hover'}*/);
+        repeated_name = true;
       } else {
         element.css("border", "none")
         element.popover("hide");
+        repeated_name = false;
       }
     },
     error: function(data){
