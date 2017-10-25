@@ -17,14 +17,13 @@ app.controller("loginController", function($scope, $http){
     $scope.invalid = false;
   }
 
-
   $scope.send = function (e) {
       e.preventDefault();
       $http.post('/auth/check_login', $scope.user).then(function(response){
         if(response.data['success']){
             var url_atual = window.location.href;
             var sep1 = url_atual.split("=").pop();
-            
+
             if(sep1==url_atual){
               window.location = response.data['url']
             }else{

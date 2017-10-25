@@ -20,6 +20,11 @@ app.controller("textController", function($scope, $http){
     });
   };
 
+  $scope.editText = function(index){
+    var pk = $scope.texts[index].pk;
+    url = 'http://127.0.0.1:8000/text/edit_text/' + pk;
+    window.location = url;
+  }
 
   $(document).ready(function(){
     /* Setting up behavior of elements */

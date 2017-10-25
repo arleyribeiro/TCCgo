@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block titleBlock %} TCC Go | Edição {% endblock %}
+
+{% block content %}
+
+ <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+   {% if user.is_authenticated %}
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2" style="text-align: center">
+        <h3>Edição de Trabalho </h3>
+        <br />
+      </div>
+    </div>
+
+    <form  method="post" id="new-text-form" name="new-text-form" class="col-md-8 col-md-offset-2">
+      {% csrf_token %}
+          <div class="row">
+              <input  class="form-control" id="title" type="text" name="title" ng-model="text.title" required placeholder="Título" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+    oninput="setCustomValidity('')"  />
+          </div>
+            <br />
+          <div class="row">
+            <textarea class="form-control" id="content" name="content" style="resize: none; height: 300px" ng-model="text.content" required placeholder="Corpo do trabalho" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+  oninput="setCustomValidity('')"  /> </textarea>
+          </div>
+            <br />
+          <button class="btn btn-primary" ng-click="update()" style="float: right;"> Salvar </button>
+    </form>
+    {% endif %}
+  </div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+var pk  = {{ pk }};
+var app = angular.module("myApp", []);
+
+app.controller("textController", function ($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  angular.element(document).ready(function(){
+    $http.post('/text/get_text',
+      {
+        'pk' : pk
+      }
+    ).then(function(response){
+      $scope.text = response.data.text;
+    });
+  });
+
+  $scope.update = function(){
+    $http.post('/text/update_text',
+      {
+        'pk' : pk,
+        'title' : $scope.text.title,
+        'content' : $scope.text.content
+      }
+    ).then(function(response){
+        alert("Atualizado com sucesso");
+      }
+    );
+  }
+});
+
+</script>
+{% endblock %}

@@ -29,13 +29,15 @@ class TextController(object):
         texts = Text.objects.all().filter(user=user)
         return texts
 
-    def get(self, user=None, title=None): # Se o models estiver certo TMJ !
+    def get(self, user=None, title=None, pk=None): # Se o models estiver certo TMJ !
         """ Given a rule name or id, return it if exists """
         try:
             if(user is not None):
                 text = Text.objects.get(user=user, title=title)
             elif(title is not None):
                 text = Text.objects.get(title=title)
+            elif(pk is not None):
+                text = Text.objects.get(pk=pk)
             else:
                 print("Nenhum parâmentro foi passado para essa função.")
                 text = None
@@ -61,6 +63,13 @@ class TextController(object):
                 print("Um usuário não pode deletar o texto de outro")
                 return 501
         return 300
+
+    def update(self, pk, title, content):
+        text = self.get(pk=pk)
+        setattr(text, 'title', title)
+        setattr(text, 'content', content)
+        text.save()
+        return text
 
 
 
@@ -119,6 +128,20 @@ class TextController(object):
         texts = TextController.get_all(request.user)
         texts = texts.filter(Q(title__icontains=filter) | Q(content__icontains=filter))
         return texts
+
+    def request_get(self, request):
+        get_json = json.loads(request.body.decode('utf-8'))
+        text = self.get(pk=get_json['pk'])
+        return text
+
+    def update_request(self, request):
+        """ update """
+        update_json = json.loads(request.body.decode('utf-8'))
+        pk = update_json['pk']
+        title = update_json['title']
+        content = update_json['content']
+        text = self.update(pk, title, content)
+        return text
 
 class FragmentController(object):
 
