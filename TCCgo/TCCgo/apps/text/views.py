@@ -67,8 +67,9 @@ def get_text(request):
 
 def get_all_texts(request):
     """ Return all texts"""
-    query_set = TextController.get_all(request.user)
-    data = serializers.serialize('json', query_set)
+    data = TextController.get_all(request.user)
+    #print(query_set[0].content)
+    #data = serializers.serialize('json', query_set)
     return JsonResponse(data, safe=False)
 
 def filter_texts(request):

@@ -6,7 +6,7 @@ app.controller("textController", function($scope, $http){
 
   $http.get('/text/all_texts')
   .then(function(data){
-    var texts = JSON.parse(data.data);
+    var texts = data.data;
     $scope.texts = texts;
   })
 
@@ -20,9 +20,8 @@ app.controller("textController", function($scope, $http){
     });
   };
 
-  $scope.editText = function(index){
-    var pk = $scope.texts[index].pk;
-    url = 'http://127.0.0.1:8000/text/edit_text/' + pk;
+  $scope.editText = function(id){
+    url = 'http://127.0.0.1:8000/text/edit_text/' + id;
     window.location = url;
   }
 

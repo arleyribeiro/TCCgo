@@ -27,7 +27,12 @@ class TextController(object):
     def get_all(user):
         """ return all texts from databade """
         texts = Text.objects.all().filter(user=user)
-        return texts
+        dict_texts = []
+        for text in texts:
+            dict_text = model_to_dict(text, fields = ["id","title", "content"])
+            dict_text["content"] = dict_text["content"].splitlines()[0]
+            dict_texts.append(dict_text)
+        return dict_texts
 
     def get(self, user=None, title=None, pk=None): # Se o models estiver certo TMJ !
         """ Given a rule name or id, return it if exists """
