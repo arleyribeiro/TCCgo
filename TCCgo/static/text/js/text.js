@@ -21,7 +21,9 @@ app.controller("textController", function($scope, $http){
   };
 
   $scope.editText = function(id){
-    url = 'http://127.0.0.1:8000/text/edit_text/' + id;
+    url = 'http://127.0.0.1:8000/text/edit_text/';
+    window.sessionStorage.setItem('myID', id);
+    //alert(window.sessionStorage.getItem('myID'));
     window.location = url;
   }
 

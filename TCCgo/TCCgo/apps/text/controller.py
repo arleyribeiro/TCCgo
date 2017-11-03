@@ -42,8 +42,8 @@ class TextController(object):
                     inconsistencies.append(dict_inconsistency)
 
             result.append({
-                "fragment": dict_fragment,
-                "inconsistencies": inconsistencies
+                'fragment': dict_fragment,
+                'inconsistencies': inconsistencies
             })
         return result
 
@@ -89,6 +89,11 @@ class TextController(object):
             print("O nome ou id de regra não existe.\n")
             return None
 
+    def get_all_t(user):
+          """ return all texts from databade """
+          texts = Text.objects.all().filter(user=user)
+          return texts
+
     def delete(self, user, title=None):
         """delete a text from database
         200 -> delete success
@@ -98,8 +103,8 @@ class TextController(object):
         text = self.get(user=user, title=title)
         if title is not None:
             if(user == text.user):
-                text = Text.objects.filter(title=title)
-                # text = TextController.get_all(user).filter(title=title)
+                print(title)
+                text = TextController.get_all_t(user).filter(title=title)
                 if text:
                     text.delete()
                     return 200
