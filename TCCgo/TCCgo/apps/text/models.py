@@ -9,4 +9,4 @@ class Text(models.Model): # qual a PK disso ???
 class Fragment(models.Model):
 	content = models.TextField(null=False, blank=False)
 	position = models.IntegerField(null=False, blank=False)
-	text = models.ForeignKey(Text, on_delete=models.CASCADE, null=False, blank=False)
+	text = models.ForeignKey(Text, on_delete=models.SET_NULL, null=True, blank=False)

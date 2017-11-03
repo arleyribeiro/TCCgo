@@ -44,7 +44,6 @@ app.controller("textController", function($scope, $http){
         text_title: ''
       }
       $scope.text.text_title=text_title;
-      alert($scope.text.text_title+' ' +$scope.text.text_title.length);
 
       $http.post('/text/delete_text', $scope.text).then(function(data){
         /*  data.error :
@@ -52,12 +51,12 @@ app.controller("textController", function($scope, $http){
             300 -> delete error
             501 -> user error
         */
-        if(data.error == 501){
+        if(data.status == 501){
           alert('Um usuário só pode deletar os próprios trabalhos.')
           return false;
         }else if(data.status == 200){
           alert('Trabalho deletado com sucesso!');
-          location.reload();
+           location.reload();
         }else if(data.status == 300){
             alert('Trabalho não pode ser deletado no momento!');
         }

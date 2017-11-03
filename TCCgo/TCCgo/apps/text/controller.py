@@ -4,7 +4,12 @@ from django.db import models
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.db.models import Q
+from TCCgo.apps.rules.models import Rule
+from TCCgo.apps.rules.models import Inconsistency
+from TCCgo.apps.rules.models import InconsistencyType
 import json
+import re
+import pprint
 
 from .models import (
     Text, Fragment
@@ -14,15 +19,48 @@ class TextController(object):
     def __init__(self):
         pass
 
-    def create(self, title, content, user):
+    def process_text(self, text, rules, user):
+        line = 1
+        inconsistency_type = InconsistencyType.objects.all().filter(type="nova")[0]
+        sentences = re.split('; |[.?!]', text.content)
+        result = []
+        for sentence in sentences:
+            if '\n' in sentence:
+                line = line + 1
+            fragment = Fragment(content = sentence, position = line, text = text)
+            fragment.save()
+            dict_fragment = model_to_dict(fragment, fields = ["id","content", "position"])
+            for rule in rules:
+                pattern = re.compile(rule.pattern)
+                inconsistencies = []
+                if pattern.search(sentence):
+                    inconsistency = Inconsistency(rule = rule, fragment = fragment, user = user, inconsistency_type=inconsistency_type)
+                    inconsistency.save()
+                    dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
+                    dict_inconsistency['rule'] = model_to_dict(rule, fields=["id", "pattern", "warning","name", "rule_type"])
+                    # dict_inconsistency['fragment'] = model_to_dict(fragment, fields=["id", "content", "position"])
+                    inconsistencies.append(dict_inconsistency)
+
+            result.append({
+                "fragment": dict_fragment,
+                "inconsistencies": inconsistencies
+            })
+        return result
+
+
+    def create(self, title, content, list_rules, user):
         """create a text and save it to database"""
         texts = Text.objects.all().filter(user=user, title=title)
         if texts:
             raise Exception('Já existe esse título no banco')
-        print("'" + title +"'")
         new_text = Text(title=title, content=content, user=user)
         new_text.save()
-        return new_text
+
+        #modificar para pegar as regras da chamada
+
+        rules = Rule.objects.all().filter(id__in=list_rules)
+        result = self.process_text(new_text, rules, user)
+        return result
 
     def get_all(user):
         """ return all texts from databade """
@@ -60,7 +98,8 @@ class TextController(object):
         text = self.get(user=user, title=title)
         if title is not None:
             if(user == text.user):
-                text = TextController.get_all(user).filter(title=title)
+                text = Text.objects.filter(title=title)
+                # text = TextController.get_all(user).filter(title=title)
                 if text:
                     text.delete()
                     return 200
@@ -84,7 +123,10 @@ class TextController(object):
         if user.is_authenticated :
             if user != None:
                 try:
-                    text_json = json.loads(request.body.decode('utf-8'))
+                    body_json = json.loads(request.body.decode('utf-8'))
+                    text_json = body_json['text']
+                    list_json = body_json['private_rules']+body_json['public_rules']
+
                     title = text_json['title']
                     content = text_json['content']
 
@@ -93,19 +135,20 @@ class TextController(object):
                     if not content:
                         raise ValueError('str conteudo vazio')
 
-                    new_text = self.create(title, content, user)
+                    result = self.create(title, content, list_json, user)
 
-                    return 200
+                    return {'status':200, 'result':result}
 
                 except ValueError as e:
                     print ("str vazia")
                 except:
                     print("erro: titulo repetido")
-        return 300
+        return {'status':300, 'result':[]}
 
     def request_delete(self, request):
         """ delete text from request"""
         user = request.user
+
         if user.is_authenticated :
             if user is not None:
                 try:

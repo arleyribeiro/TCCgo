@@ -9,7 +9,7 @@ class RuleTypeAdmin(admin.ModelAdmin):
     list_display = ['type']
 
 class InconsistencyAdmin(admin.ModelAdmin):
-    list_display = []
+    list_display = ['id']
 
 class InconsistencyTypeAdmin(admin.ModelAdmin):
     list_display = ['type']

@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core import serializers
 from django.forms.models import model_to_dict
+from TCCgo.apps.rules.models import Rule
 from pprint import pprint
 
 from .controller import (
@@ -32,11 +33,13 @@ def edit_text_page(request, pk):
 
 def create_text(request):
     """ create a new text """
-    status = TextController().request_create(request)
-    if status == 200:
-        return JsonResponse({'success':True, 'url':'127.0.0.1:8000'}, safe=False)
+    # return JsonResponse({'success':True})
+    result = TextController().request_create(request)
+    if result['status'] == 200:
+        return JsonResponse({'success':True, 'result':result['result']}, safe=False)
     else:
-        return JsonResponse({'success':False}, safe=False)
+        return JsonResponse({'success':False, 'result':[]}, safe=False)
+
 
 def delete_text(request):
     """ Delete text from request
@@ -44,13 +47,15 @@ def delete_text(request):
     300 -> delete error
     501 -> user error
     """
+    # return JsonResponse({'status':200}, safe=False)
+
     status = TextController().request_delete(request)
     if status == 200:
-        return JsonResponse({'error':200}, safe=False)
+        return JsonResponse({'status':200}, safe=False)
     elif status == 501:
-        return JsonResponse({'error':501}, safe=False)
+        return JsonResponse({'status':501}, safe=False)
     else:
-        return JsonResponse({'error':300}, safe=False)
+        return JsonResponse({'status':300}, safe=False)
 
 def update_text(request):
     """ Update a text """

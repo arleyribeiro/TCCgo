@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block titleBlock %} TCC Go | Edição {% endblock %}
+{% block titleBlock %} TCC Go{% endblock %}
 
 {% block content %}
 
- <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+ <div id="novo_texto" class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
    {% if user.is_authenticated %}
     <div class="row">
       <div class="col-md-8 col-md-offset-2" style="text-align: center">
@@ -25,7 +25,50 @@
   oninput="setCustomValidity('')"  /> </textarea>
           </div>
             <br />
-          <button class="btn btn-primary" ng-click="enviar()" style="float: right;"> enviar </button>
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal" style="float: right;"> Selecionar Regras</button>
+
+
+          <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Regras</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <center><h4>Regras Públicas</h4></center>
+                      <div class="col-md-1"></div>
+                      <div class="col-md-10">
+                        <select name="public_selected" id="public_selected" ng-model="public_selected" multiple class="form-control">
+                          <option ng-hide="rule.scope == 'PV'"ng-repeat="rule in rules" ng-bind="rule.name" ng-value="rule.id"></option>
+                        </select>
+                      </div>
+                      <div class="col-md-1"></div>
+                    </div>
+                    <div class="row" style="margin-top:15px">
+                      <center><h4>Regras Públicas</h4></center>
+                      <div class="col-md-1"></div>
+                      <div class="col-md-10">
+                        <select name="private_selected" id="private_selected" ng-model="private_selected" multiple class="form-control">
+                          <option ng-hide="rule.scope == 'PU'"ng-repeat="rule in rules" ng-bind="rule.name" ng-value="rule.id"></option>
+                        </select>
+                      </div>
+                      <div class="col-md-1"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">cancelar</button>
+                  <button type="submit" class="btn btn-primary" ng-click="enviar()"> Salvar e Processar</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
     </form>
     {% endif %}
   </div>
@@ -45,13 +88,25 @@ app.controller("textController", function ($scope, $http){
     content: ''
   }
 
+  $scope.rules = []
+  $scope.public_selected = []
+  $scope.private_selected = []
+
+  $http.get('/rules/all_rules')
+  .then(function(response){
+    $scope.rules = response.data['rules'];
+  });
+
   $scope.send = function(e){
     e.preventDefault();
 
-    $http.post('/text/submit',$scope.text).then(function(response){
+    $http.post('/text/submit',{text:$scope.text, public_rules:$scope.public_selected, private_rules:$scope.private_selected}).then(function(response){
         if(response.data['success'])
         {
           alert("Texto cadastrado com sucesso");
+          $scope.text['title'] = '';
+          $scope.text['content'] = '';
+          jQuery('#myModal').modal('toggle');
         }else{
           alert("Título já é utilizado. Escolha outro por favor");
         }
