@@ -34,17 +34,19 @@
 
 {% block script %}
 <script type="text/javascript">
-var pk  = {{ pk }};
 var app = angular.module("myApp", []);
 
 app.controller("textController", function ($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+  var myID = window.sessionStorage.getItem('myID');
+
+  //window.sessionStorage.clear();
 
   angular.element(document).ready(function(){
     $http.post('/text/get_text',
       {
-        'pk' : pk
+        'pk' : myID
       }
     ).then(function(response){
       $scope.text = response.data.text;
@@ -54,7 +56,7 @@ app.controller("textController", function ($scope, $http){
   $scope.update = function(){
     $http.post('/text/update_text',
       {
-        'pk' : pk,
+        'pk' : myID,
         'title' : $scope.text.title,
         'content' : $scope.text.content
       }

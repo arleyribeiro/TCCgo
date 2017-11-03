@@ -21,7 +21,9 @@ app.controller("textController", function($scope, $http){
   };
 
   $scope.editText = function(id){
-    url = 'http://127.0.0.1:8000/text/edit_text/' + id;
+    url = 'http://127.0.0.1:8000/text/edit_text/';
+    window.sessionStorage.setItem('myID', id);
+    //alert(window.sessionStorage.getItem('myID'));
     window.location = url;
   }
 
@@ -44,7 +46,7 @@ app.controller("textController", function($scope, $http){
         text_title: ''
       }
       $scope.text.text_title=text_title;
-      alert($scope.text.text_title+' ' +$scope.text.text_title.length);
+      //alert($scope.text.text_title+' ' +$scope.text.text_title.length);
 
       $http.post('/text/delete_text', $scope.text).then(function(data){
         /*  data.error :

@@ -25,10 +25,10 @@ def text_page(request):
 def all_texts_page(request):
 	return render(request, 'list.html')
 
-def edit_text_page(request, pk):
+def edit_text_page(request):
     """ Render the edit text page """
-    print("Valor do pk " + pk)
-    return render(request, 'edit.html', {'pk' : pk})
+    #print("Valor do pk " + pk)
+    return render(request, 'edit.html')
 
 def create_text(request):
     """ create a new text """
