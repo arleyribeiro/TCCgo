@@ -107,6 +107,10 @@ app.controller("textController", function ($scope, $http){
           $scope.text['title'] = '';
           $scope.text['content'] = '';
           jQuery('#myModal').modal('toggle');
+          id = response.data['result']['id'];
+          url = 'http://127.0.0.1:8000/text/processing_text/';
+          window.sessionStorage.setItem('myID', id);
+          window.location = url;
         }else{
           alert("Título já é utilizado. Escolha outro por favor");
         }

@@ -27,6 +27,12 @@ app.controller("textController", function($scope, $http){
     window.location = url;
   }
 
+  $scope.processingText = function(id){
+    url = 'http://127.0.0.1:8000/text/processing_text/';
+    window.sessionStorage.setItem('myID', id);
+    window.location = url;
+  }
+
   $(document).ready(function(){
     /* Setting up behavior of elements */
 

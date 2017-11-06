@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^edit_text/', login_required(views.edit_text_page), name='edit_text'),
     url(r'^update_text', login_required(views.update_text), name='update_text'),
     url(r'^get_text', login_required(views.get_text), name='get_text'),
+    url(r'^processing_text', login_required(views.processing_text_page), name='processing_text'),
+    url(r'^get_processed_text', login_required(views.get_processed_text), name='get_processed_text'),
 ]

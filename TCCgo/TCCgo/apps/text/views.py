@@ -31,6 +31,10 @@ def edit_text_page(request):
     #print("Valor do pk " + pk)
     return render(request, 'edit.html')
 
+def processing_text_page(request):
+    """ Render the processing text page """
+    return render(request, 'processing.html')
+
 def create_text(request):
     """ create a new text """
     # return JsonResponse({'success':True})
@@ -67,8 +71,12 @@ def get_text(request):
     """Return a text given it pk """
     controller = TextController()
     text = controller.request_get(request)
-    print(text)
     return JsonResponse({'text' : model_to_dict(text)}, safe=False)
+
+def get_processed_text(request):
+    controller = TextController()
+    result = controller.request_get_processed_text(request)
+    return JsonResponse(result, safe=False)
 
 def get_all_texts(request):
     """ Return all texts"""

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block titleBlock %} TCC Go | Processamento {% endblock %}
+
+{% block content %}
+
+ <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+   {% if user.is_authenticated %}
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2" style="text-align: center">
+        <h3>Tratamento de Inconsistências </h3>
+        <br />
+      </div>
+    </div>
+    <div class="row">
+      <form  method="post" id="new-text-form" name="new-text-form" class="col-md-8 col-md-offset-2">
+        {% csrf_token %}
+        <!-- Fragmentos -->
+        <div class="col-md-6">
+          <a href="#" ng-repeat="sentence in sentences" editable-text="sentence.fragment.content" >{{sentence.inconsistencies.length}}<br/></a>
+        </div>
+        <!-- Inconsistências -->
+        <div class="col-md-6">
+
+        </div>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+var app = angular.module("myApp", []);
+
+app.controller("textController", function ($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+  var myID = window.sessionStorage.getItem('myID');
+  $scope.sentences = []
+
+  window.sessionStorage.clear();
+
+  angular.element(document).ready(function(){
+    if(myID)
+    {
+      $http.post('/text/get_processed_text',
+        {
+          'id' : myID
+        }
+      ).then(function(response){
+        alert(response.data[0]['fragment']['content']);
+          $scope.sentences = response.data;
+      });
+    }
+    else
+    {
+      // alert("Falha ao requistar texto, sessão vazia.");
+    }
+
+  });
+
+});
+
+</script>
+{% endblock %}

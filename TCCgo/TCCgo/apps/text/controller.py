@@ -19,33 +19,53 @@ class TextController(object):
     def __init__(self):
         pass
 
+    def get_processed_text(self, text_id):
+        result = []
+        text = Text.objects.filter(id=text_id)[0]
+        fragments = Fragment.objects.filter(text=text)
+        print(len(fragments))
+        for fragment in fragments:
+            dict_fragment = model_to_dict(fragment, fields = ["id","content", "position"])
+            inconsistencies = Inconsistency.objects.filter(fragment=fragment)
+            l_inconsistencies = []
+            for inconsistency in inconsistencies:
+                dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
+                dict_inconsistency['rule'] = model_to_dict(inconsistency.rule, fields=["id", "pattern", "warning","name", "rule_type"])
+                l_inconsistencies.append(dict_inconsistency)
+            result.append({
+                'fragment': dict_fragment,
+                'inconsistencies': l_inconsistencies
+            })
+
+        return result
+
     def process_text(self, text, rules, user):
         line = 1
         inconsistency_type = InconsistencyType.objects.all().filter(type="nova")[0]
         sentences = re.split('; |[.?!]', text.content)
-        result = []
+        # result = []
         for sentence in sentences:
             if '\n' in sentence:
                 line = line + 1
             fragment = Fragment(content = sentence, position = line, text = text)
             fragment.save()
-            dict_fragment = model_to_dict(fragment, fields = ["id","content", "position"])
+            # dict_fragment = model_to_dict(fragment, fields = ["id","content", "position"])
             for rule in rules:
                 pattern = re.compile(rule.pattern)
                 inconsistencies = []
                 if pattern.search(sentence):
                     inconsistency = Inconsistency(rule = rule, fragment = fragment, user = user, inconsistency_type=inconsistency_type)
                     inconsistency.save()
-                    dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
-                    dict_inconsistency['rule'] = model_to_dict(rule, fields=["id", "pattern", "warning","name", "rule_type"])
+                    # dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
+                    # dict_inconsistency['rule'] = model_to_dict(rule, fields=["id", "pattern", "warning","name", "rule_type"])
                     # dict_inconsistency['fragment'] = model_to_dict(fragment, fields=["id", "content", "position"])
-                    inconsistencies.append(dict_inconsistency)
+                    # inconsistencies.append(dict_inconsistency)
 
-            result.append({
-                'fragment': dict_fragment,
-                'inconsistencies': inconsistencies
-            })
-        return result
+            # result.append({
+            #     'fragment': dict_fragment,
+            #     'inconsistencies': inconsistencies
+            # })
+        # return result
 
 
     def create(self, title, content, list_rules, user):
@@ -55,12 +75,12 @@ class TextController(object):
             raise Exception('Já existe esse título no banco')
         new_text = Text(title=title, content=content, user=user)
         new_text.save()
-
+        dict_text = model_to_dict(new_text, fields=["id", "title", "content"])
         #modificar para pegar as regras da chamada
 
         rules = Rule.objects.all().filter(id__in=list_rules)
-        result = self.process_text(new_text, rules, user)
-        return result
+        self.process_text(new_text, rules, user)
+        return dict_text
 
     def get_all(user):
         """ return all texts from databade """
@@ -186,6 +206,11 @@ class TextController(object):
         get_json = json.loads(request.body.decode('utf-8'))
         text = self.get(pk=get_json['pk'])
         return text
+
+    def request_get_processed_text(self, request):
+        get_json = json.loads(request.body.decode('utf-8'))
+        result = self.get_processed_text(text_id=get_json['id'])
+        return result
 
     def update_request(self, request):
         """ update """
