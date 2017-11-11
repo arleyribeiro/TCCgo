@@ -3,36 +3,55 @@
 {% block titleBlock %} TCC Go | Processamento {% endblock %}
 
 {% block content %}
-
- <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
+<div ng-app="myApp">
+  <div class="container" class="col-md-8 col-md-offset-2" ng-controller="textController">
    {% if user.is_authenticated %}
     <div class="row">
       <div class="col-md-8 col-md-offset-2" style="text-align: center">
-        <h3>Tratamento de Inconsistências </h3>
+        <h1>Tratamento de Inconsistências </h1>
         <br />
       </div>
     </div>
     <div class="row">
-      <form  method="post" id="new-text-form" name="new-text-form" class="col-md-8 col-md-offset-2">
-        {% csrf_token %}
+      <div class="col-md-10 col-md-offset-1">
         <!-- Fragmentos -->
         <div class="col-md-6">
-          <a href="#" ng-repeat="sentence in sentences" editable-text="sentence.fragment.content" >{{sentence.inconsistencies.length}}<br/></a>
+          <h2>Texto</h2>
+          <a style="color:#000000; text-decoration:none; outline:0" href="#" ng-repeat="sentence in sentences" editable-text="sentence.fragment.content" onaftersave="check(sentence)">
+            {[{sentence.fragment.content}]}<sup>{[{$index}]}</sup><br/>
+          </a>
         </div>
         <!-- Inconsistências -->
         <div class="col-md-6">
-
+          <h2>Inconsistências</h2>
+          <div ng-repeat="sentence in sentences">
+            <h4 ng-show="sentence.inconsistencies.length">{[{$index}]}</h4>
+            <p ng-repeat="inconsistency in sentence.inconsistencies" ng-show="inconsistency.inconsistency_type==1">
+              Regra: {[{inconsistency.rule.name}]} <br/>
+              Padrão: {[{inconsistency.rule.pattern}]} <br/>
+              Mensagem: {[{inconsistency.rule.warning}]} <br/>
+            </p>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
     {% endif %}
   </div>
-
+</div>
 {% endblock %}
 
 {% block script %}
 <script type="text/javascript">
-var app = angular.module("myApp", []);
+var app = angular.module("myApp", ["xeditable"]);
+
+app.config(function($interpolateProvider) {
+ $interpolateProvider.startSymbol('{[{');
+ $interpolateProvider.endSymbol('}]}');
+});
+
+app.run(function(editableOptions) {
+  editableOptions.theme = 'bs3';
+});
 
 app.controller("textController", function ($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
@@ -42,6 +61,12 @@ app.controller("textController", function ($scope, $http){
 
   window.sessionStorage.clear();
 
+  $scope.check = function(sentence){
+    for (var i = 0; i <sentence.inconsistencies.length; i++) {
+      sentence.inconsistencies[i].inconsistency_type = 2;
+    }
+  }
+
   angular.element(document).ready(function(){
     if(myID)
     {
@@ -50,13 +75,13 @@ app.controller("textController", function ($scope, $http){
           'id' : myID
         }
       ).then(function(response){
-        alert(response.data[0]['fragment']['content']);
           $scope.sentences = response.data;
       });
     }
     else
     {
-      // alert("Falha ao requistar texto, sessão vazia.");
+      url = 'http://127.0.0.1:8000/text/list_texts/';
+      window.location = url;
     }
 
   });

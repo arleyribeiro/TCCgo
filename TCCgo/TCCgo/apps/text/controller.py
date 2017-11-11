@@ -29,7 +29,7 @@ class TextController(object):
             inconsistencies = Inconsistency.objects.filter(fragment=fragment)
             l_inconsistencies = []
             for inconsistency in inconsistencies:
-                dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
+                dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistency_type"])
                 dict_inconsistency['rule'] = model_to_dict(inconsistency.rule, fields=["id", "pattern", "warning","name", "rule_type"])
                 l_inconsistencies.append(dict_inconsistency)
             result.append({
