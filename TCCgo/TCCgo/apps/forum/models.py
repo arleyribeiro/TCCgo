@@ -13,3 +13,4 @@ class Post(models.Model):
 	date = models.DateField(auto_now=True)
 	reply = models.ForeignKey('self', on_delete = models.SET_NULL, blank=True, null=True)
 	topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=False, null=True)
+	user = models.ForeignKey(User, on_delete = models.SET_NULL, blank=False, null=True)

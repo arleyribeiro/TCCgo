@@ -3,12 +3,81 @@
 {% block titleBlock %} TCC go | FÓRUM {% endblock %}
 
 {% block content %}
+<div class="container">
+	<div class="row" >
+		<div class="col-md-8 col-md-offset-2" style="text-align: center">
+			<h3> Welcome to the Django </h3>
+			<br />
+		</div>
+	</div>
 
+	<div id="accordion" class="col-md-10 col-md-offset-2 panel-group" ng-controller="forumController">
+		<!-- Search input  -->
+		<div class="input-group input-group col-md-10 col-md-offset-0">
+			<input class="form-control" type="text" name="topic_search" ng-change="filterTopics()" ng-model="searchTopic" placeholder="Buscar Tópico">
+			<span class="input-group-btn">
+				<button class="btn btn-primary" data-toggle="tooltip" title="Buscar"><span class="glyphicon glyphicon-search" ></span></button>
+			</span>
+		</div>
+		<br />
+		<button type="submit" class="btn btn-primary" ng-click="newTopic()"> Novo Tópico</button>
 
-<h1 class="text-center text-primary">Bem vindo ao FORUM Go</h1>
-
+		<!--Panels  -->
+	<form method="post" action="login" id="myForm" name="myForm" ng-submit="send($event)" validate>
+			{% csrf_token %}
+		<div class="panel panel-default" ng-repeat="topic in topics">
+			<div class="panel-heading topic" >
+					<span data-id="topic.title" ng-bind="topic.title" style="font-weight: bold"></span>
+					<!-- <div class="btn-group" style="float: right">
+						<a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Editar" ng-click="editText(text.id)"><span class="glyphicon glyphicon-pencil" ></span></a>
+						<a href="#" class="btn btn-primary btn-xs" data-toggle="tooltip" title="Processar" ng-click="processingText(text.id)"><span class="glyphicon glyphicon-eye-open" ></span></a>
+						<button type="button" class="btn btn-primary btn-xs remove-button" data-toggle="tooltip" title="Deletar"><span class="glyphicon glyphicon-trash" ></span></button>
+					</div> -->
+				</div>
+				<div class="panel-body">
+					<p ng-bind="topic.message"></p>
+				</div>
+		</div>
+	</div>
+	</form>
+</div>
 {% endblock %}
 
 {% block script %}
+<script>
+var app = angular.module("myApp", []);
 
+app.controller("forumController", function($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+
+	$scope.searchTopic = "";
+
+	$http.get('/forum/all_topics')
+  .then(function(data){
+    var topics = data.data;
+    $scope.topics = topics;
+		alert($scope.topics);
+  });
+
+	$scope.filterTopics = function(){
+		$http.post('/forum/filter_topics',
+			{
+				'search_topic' : $scope.searchTopic
+			}
+		).then(function(response){
+			$scope.topics = response.data['filtered_topics'];
+			//$scope.$digest();
+		});
+	};
+
+	$scope.newTopic = function(){
+		url = 'http://127.0.0.1:8000/forum/new_topic/';
+    window.location = url;
+	}
+
+});
+
+</script>
 {% endblock %}

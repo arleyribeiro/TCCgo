@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block titleBlock %} TCC Go{% endblock %}
+
+{% block content %}
+
+ <div id="novo_texto" class="container" class="col-md-8 col-md-offset-2" ng-controller="topicController">
+   {% if user.is_authenticated %}
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2" style="text-align: center">
+        <h3>Novo Tópico </h3>
+        <br />
+      </div>
+    </div>
+
+    <form  method="post" action="submit_text" id="new-text-form" name="new-text-form"class="col-md-8 col-md-offset-2" ng-submit="send($event)">
+      {% csrf_token %}
+          <div class="row">
+              <input  class="form-control" id="title" type="text" name="title" ng-model="topic.title" required placeholder="Título" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+    oninput="setCustomValidity('')"  />
+          </div>
+            <br />
+          <div class="row">
+            <textarea class="form-control" id="content" name="message" style="resize: none; height: 300px" ng-model="topic.message" required placeholder="Mensagem" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
+  oninput="setCustomValidity('')"  /> </textarea>
+          </div>
+            <br />
+            <button type="submit" class="btn btn-primary pull-right" ng-click="enviar()">Enviar</button>
+    </form>
+    {% endif %}
+  </div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+var app = angular.module("myApp", []);
+
+app.controller("topicController", function ($scope, $http){
+  $http.defaults.xsrfCookieName = 'csrftoken';
+  $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+  $scope.topic = {
+    title: '',
+    message: ''
+  }
+
+  $scope.send = function(e){
+    e.preventDefault();
+    $http.post('/forum/create_topic',{topic:$scope.topic}).then(function(response){
+        if(response.data['success'])
+        {
+          alert("Tópico cadastrado com sucesso");
+          url = 'http://127.0.0.1:8000/forum/view_topic';
+          window.location = url;
+        }
+      }
+    );
+  }
+});
+
+</script>
+{% endblock %}
