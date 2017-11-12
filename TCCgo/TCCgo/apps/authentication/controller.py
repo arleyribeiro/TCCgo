@@ -163,3 +163,9 @@ class UserController(object):
                 return 200 # Sucess
         else:
             return 300 # Invalid
+
+    def request_get_user(self,request):
+        get_json = json.loads(request.body.decode('utf-8'))
+        pk = get_json['user']
+        user = User.objects.get(pk=pk)
+        return user

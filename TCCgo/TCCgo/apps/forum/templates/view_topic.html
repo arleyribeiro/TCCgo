@@ -3,23 +3,39 @@
 {% block titleBlock %} TCC Go{% endblock %}
 
 {% block content %}
-<div id="novo_texto" class="container" class="col-md-8 col-md-offset-2" ng-controller="topicController">
+<div id="visualizar_topico" class="container" class="col-md-8 col-md-offset-2" ng-controller="topicController">
   {% if user.is_authenticated %}
-   <div class="row">
-     <div class="col-md-8 col-md-offset-2" style="text-align: center">
-       <h3>Tópico </h3>
-       <br />
-     </div>
-   </div>
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" style="text-align: center">
+      <h3> </h3>
+      <br />
+    </div>
+  </div>
 
+ <div class="row">
    <div class="col-md-8 col-md-offset-2" style="text-align: left">
      <span data-id="topic.title" ng-bind="topic.title" style="font-weight: bold; font-size: 200%;"></span>
+     <hr width=100% style="border-color:blue; background-color:black;"/>
    </div>
-    <hr width=65% style="border-color:blue; background-color:black;"/>
+ </div>
 
-   <div class="col-md-8 col-md-offset-2" style="text-align: left">
-     <span data-id="topic.message" ng-bind="topic.title" ></span>
+ <div class="row">
+   <div class="col-md-8 col-md-offset-2" >
+     <pre data-id="topic.message" ng-bind="topic.message" style=" font-size: 100%; text-align: left" ></pre>
    </div>
+
+   <div class="col-md-8 col-md-offset-2"style="font-size: 150%; text-align: right; padding-right: 20px;" >
+        <span data-id="user" ng-bind="user" ></span>
+   </div>
+ </div>
+
+<div class="row">
+   <div class="col-md-8 col-md-offset-2" style="text-align: left">
+     <br />
+     <hr width=100% style="border-color:blue; background-color:black;"/>
+     <span style="font-weight: bold; font-size: 150%;"> Respostas</span>
+   </div>
+</div>
 {% endif %}
 </div>
 {% endblock %}
@@ -33,16 +49,29 @@ app.controller("topicController", function ($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
   var myID = window.sessionStorage.getItem('myID');
-  alert(myID);
-  angular.element(document).ready(function(){
+
+
     $http.post('/forum/get_topic',
       {
         'pk' : myID
       }
     ).then(function(response){
+            var  user = response.data.topic.user;
       $scope.topic = response.data.topic;
+
+          $http.post('/forum/get_user',
+            {
+              'user' : user
+            }
+          ).then(function(response){
+            $scope.user = response.data.user['username'];
+          });
     });
-  });
+
+
+
+
+
 
 
 });

@@ -8,6 +8,8 @@ from .controller import (
 	TopicController
 )
 
+from TCCgo.apps.authentication.controller import UserController
+
 # Create your views here.
 
 def forum_page(request):
@@ -46,3 +48,8 @@ def get_topic(request):
     controller = TopicController()
     topic = controller.request_get(request)
     return JsonResponse({'topic' : model_to_dict(topic)}, safe=False)
+
+def get_user(request):
+	controller = UserController()
+	user = controller.request_get_user(request)
+	return JsonResponse({'user': model_to_dict(user)}, safe=False)
