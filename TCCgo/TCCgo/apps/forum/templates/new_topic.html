@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <form  method="post" action="submit_text" id="new-text-form" name="new-text-form"class="col-md-8 col-md-offset-2" ng-submit="send($event)">
+    <form  method="post" action="submit_topic" id="new-text-form" name="new-text-form"class="col-md-8 col-md-offset-2" ng-submit="send($event)">
       {% csrf_token %}
           <div class="row">
               <input  class="form-control" id="title" type="text" name="title" ng-model="topic.title" required placeholder="Título" oninvalid="this.setCustomValidity('Preencha o campo por favor')"
@@ -52,6 +52,9 @@ app.controller("topicController", function ($scope, $http){
         {
           alert("Tópico cadastrado com sucesso");
           url = 'http://127.0.0.1:8000/forum/view_topic';
+          id =response.data['result']['id'];
+          window.sessionStorage.setItem('myID', id);
+          alert(id);
           window.location = url;
         }
       }

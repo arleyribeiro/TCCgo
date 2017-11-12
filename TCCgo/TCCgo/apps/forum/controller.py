@@ -38,10 +38,9 @@ class TopicController(object):
             if user != None:
                     body_json = json.loads(request.body.decode('utf-8'))
                     topic_json = body_json['topic']
-
                     title = topic_json['title']
                     message = topic_json['message']
-                    print(title+'   '+ message)
+
                     result = self.create(title, message,user)
 
                     return {'status':200, 'result':result}
@@ -56,3 +55,21 @@ class TopicController(object):
             dict_text["message"] = dict_text["message"].splitlines()[0]
             dict_texts.append(dict_text)
         return dict_texts
+
+    def get(self, pk=None):
+        try:
+            if(pk is not None):
+                topic = Topic.objects.get(pk=pk)
+            else:
+                print("Nenhum parâmentro foi passado para essa função.")
+                topic = None
+            return topic
+        except Topic.DoesNotExist:
+                print("O nome ou id de regra não existe.\n")
+                return None
+
+
+    def request_get(self, request):
+        get_json = json.loads(request.body.decode('utf-8'))
+        topic = self.get(pk=get_json['pk'])
+        return topic
