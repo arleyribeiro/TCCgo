@@ -1,0 +1,7 @@
+pre#message{
+  font-size: 100%;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

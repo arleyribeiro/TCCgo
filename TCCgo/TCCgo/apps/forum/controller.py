@@ -6,6 +6,7 @@ from django.contrib.auth import login as auth_login
 
 import json
 
+from TCCgo.apps.authentication.models import User
 
 from .models import (
     Topic, Post
@@ -73,3 +74,68 @@ class TopicController(object):
         get_json = json.loads(request.body.decode('utf-8'))
         topic = self.get(pk=get_json['pk'])
         return topic
+
+
+class PostController(object):
+    def __init__(self):
+        pass
+
+    def create(self, body, reply, topic, user):
+        if (body is not None and topic is not None):
+            new_post = Post(body=body, reply=reply, topic=topic, user=user)
+            new_post.save()
+            return 200
+        else:
+            return 300
+
+    def get(self, pk=None):
+        try:
+            if(pk is not None):
+                post = Post.objects.get(pk=pk)
+            else:
+                print("Nenhum parâmentro foi passado para essa função.")
+                post = None
+            return post
+        except Post.DoesNotExist:
+                print("O nome ou id de regra não existe.\n")
+                return None
+
+
+    def request_create(self, request):
+        controller = TopicController()
+
+        user = request.user
+        if user.is_authenticated :
+            if user != None:
+                    post_json = json.loads(request.body.decode('utf-8'))
+                    #post_json = body_json['post']
+
+                    body = post_json['body']
+                    # reply = post_json['reply']
+                    # reply = self.get(reply)
+                    reply = None
+
+                    topic = post_json['topic']
+                    topic = controller.get(topic)
+                    user1 = post_json['user']
+                    #print("\n \n\n\n " + user1)
+                    user = User.objects.get(pk=user1)
+                    result = self.create(body,reply, topic, user)
+
+                    return result
+        return 300
+
+    def request_get_posts(self, request):
+        post_json = json.loads(request.body.decode('utf-8'))
+        topic = post_json['topic']
+
+        posts = Post.objects.filter(topic=topic).order_by('date')
+
+        dict_texts = []
+        for post in posts:
+            print(post.user)
+            dict_text = model_to_dict(post, fields = ["id","body", "reply","date","topic", "user"])
+            dict_text['user'] = model_to_dict(post.user, fields = ["id","username"])
+            dict_texts.append(dict_text)
+            print(dict_texts[0]['user'])
+        return dict_texts
