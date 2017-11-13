@@ -15,34 +15,33 @@
 		</div>
 	</div>
 
-	<div class="col-md-10 col-md-offset-2 " style="text-align: center">
 		<!-- Search input  -->
-		<div class="input-group input-group col-md-10 col-md-offset-0 ">
+		<div class="input-group input-group col-md-8 col-md-offset-2 ">
 			<input class="form-control" type="text" name="topic_search" ng-change="filterTopics()" ng-model="searchTopic" placeholder="Buscar Tópico">
 			<span class="input-group-btn">
 				<button class="btn btn-primary" data-toggle="tooltip" title="Buscar"><span class="glyphicon glyphicon-search" ></span></button>
 			</span>
 		</div>
-	</div>
-	<br/><br/><br/>
+
+	<br/><br/>
 	<div class="col-md-12 text-center">
 		<button type="submit" class="btn btn-primary" ng-click="newTopic()"> Novo Tópico</button>
 	</div>
 	<br/><br/><br/>
 		<!--Panels  -->
-	<div class="col-md-10 col-md-offset-1 panel-group">
-	<form method="post" action="login" id="myForm" name="myForm" ng-submit="send($event)" validate>
-			{% csrf_token %}
-		<div class="panel panel-default" ng-repeat="topic in topics" ng-click="viewTopic(topic.id)">
-			<div class="panel-heading topic"  >
-					<span data-id="topic.title" ng-bind="topic.title" style="font-weight: bold"></span>
-				</div>
-				<div class="panel-body">
-					<p ng-bind="topic.message"></p>
-				</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2" ng-repeat="topic in topics" ng-click="viewTopic(topic.id)">
+		<div class="panel panel-default" >
+				<div class="panel-heading topic"  >
+						<span data-id="topic.title" ng-bind="topic.title" style="font-weight: bold"></span>
+					</div>
+					<div class="panel-body">
+						<p ng-bind="topic.message"></p>
+					</div>
+			</div>
 		</div>
-	</form>
 	</div>
+
 </div>
 {% endblock %}
 
