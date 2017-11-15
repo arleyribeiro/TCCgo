@@ -2,16 +2,75 @@
 
 {% block titleBlock %} TCC Go{% endblock %}
 
+{% block links %}
+<link rel="stylesheet" href="/static/forum/css/forum.css">
+{% endblock %}
+
 {% block content %}
-<div id="novo_texto" class="container" class="col-md-8 col-md-offset-2" ng-controller="topicController">
+<div id="visualizar_topico" class="container" class="col-md-8 col-md-offset-2" ng-controller="topicController">
   {% if user.is_authenticated %}
-   <div class="row">
-     <div class="col-md-8 col-md-offset-2" style="text-align: center">
-       <h3>Tópico </h3>
-       <br />
-     </div>
-   </div>
-{% endif %}
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" style="text-align: center">
+      <h3> </h3>
+      <br />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" style="text-align: left">
+      <span data-id="topic.title" ng-bind="topic.title" style="font-weight: bold; font-size: 200%;"></span>
+      <button type="submit" class="btn btn-primary col-md-offset-6 text-center" ng-click="editTopic(topic.id)" style="text-align:center; padding-right: 45px;">Editar</button>
+      <hr width=100% style="border-color:blue; background-color:black;"/>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" >
+      <pre id="message" data-id="topic.message" ng-bind="topic.message" ></pre>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2" style="font-size: 150%; text-align: right; padding-right: 20px;" >
+      <span data-id="user" ng-bind="user" ></span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2" style="text-align: left">
+      <hr width=100% style="border-color:blue; background-color:black;"/>
+      <span style="font-weight: bold; font-size: 150%;" ng-bind="num_respostas"></span>
+      <span style="font-weight: bold; font-size: 150%;">Respostas</span>
+    </div>
+  </div>
+  <br /><br/>
+
+  <div class="row"> <!-- Colocar as respostas -->
+    <div class="col-md-8 col-md-offset-2" ng-repeat="post in posts" >
+
+        <pre  data-id="post.body" ng-bind="post.body" ></pre>
+        <div class="col-md-8 col-md-offset-4" style="font-size: 150%; text-align: right; padding-right: 0;" >
+          <span data-id="post.user.username" ng-bind="post.user.username" ></span>
+        </div>
+
+        <hr width=100% style="border-color:blue; background-color:black;"/>
+        <br/>
+    </div>
+  </div>
+
+  <br /><br/>
+  <div class="row">
+    <div class=" col-md-8 col-md-offset-2">
+      <form method="post" action="post" id="myForm" name="myForm" ng-submit="send($event)" validate>
+          {% csrf_token %}
+          <textarea class="form-control" id="post" name="post" style="resize: none; height: 120px; width: 84%;" ng-model="text" required placeholder="Enviar Resposta" validate/> </textarea>
+            <br />
+          <button type="submit" class="btn btn-primary col-md-offset-8" style="text-align:center;">Enviar Resposta</button>
+      </form>
+    </div>
+  </div>
+<br/>
+
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -23,9 +82,69 @@ var app = angular.module("myApp", []);
 app.controller("topicController", function ($scope, $http){
   $http.defaults.xsrfCookieName = 'csrftoken';
   $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+  var myID = window.sessionStorage.getItem('myID');
+
+  var user = {{user.id}};
+
+
+  $scope.isUser = true;
+  $scope.text='';
+  $scope.posts="";
+
+
+  $http.post('/forum/get_topic',
+  {
+    'pk' : myID
+  }).then(function(response){
+  var  user = response.data.topic.user;
+  $scope.topic = response.data.topic;
+
+      $http.post('/forum/get_user',
+      {
+        'user' : user
+      }).then(function(response){
+      $scope.user = response.data.user['username'];
+      });
+    });
+
+
+      $http.post('/forum/get_posts',{
+        'topic': myID
+      }).then(function(response){
+        $scope.posts = response.data;
+        $scope.num_respostas =$scope.posts.length;
+        //alert($scope.posts);
+      });
+
+
+  $scope.editTopic = function(id){
+
+  };
+
+
+  $scope.send = function (e) {
+      e.preventDefault();
+      //alert($scope.topic.user+'   user');
+      $http.post('/forum/create_post',
+      {
+        'body': $scope.text,
+        'topic': myID,
+        'user':  String(user) ,
+        'reply':''
+      }
+      ).then(function(response){
+        if(response.data['success']){
+          alert('Resposta Enviada');
+          window.reload;
+        }else{
+          alert('Erro ao enviar Resposta');
+        }
+      });
+    };
 
 
 });
+
 </script>
 
 {% endblock %}
