@@ -43,6 +43,8 @@ class TextController(object):
         line = 1
         inconsistency_type = InconsistencyType.objects.all().filter(type="nova")[0]
         sentences = re.split('; |[.?!]', text.content)
+        if(sentences[-1]==''):
+            sentences.pop()
         # result = []
         for sentence in sentences:
             if '\n' in sentence:
