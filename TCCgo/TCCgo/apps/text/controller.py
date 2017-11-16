@@ -45,29 +45,72 @@ class TextController(object):
         sentences = re.split('; |[.?!]', text.content)
         if(sentences[-1]==''):
             sentences.pop()
-        # result = []
         for sentence in sentences:
             if '\n' in sentence:
                 line = line + 1
             fragment = Fragment(content = sentence, position = line, text = text)
             fragment.save()
-            # dict_fragment = model_to_dict(fragment, fields = ["id","content", "position"])
             for rule in rules:
                 pattern = re.compile(rule.pattern)
                 inconsistencies = []
                 if pattern.search(sentence):
                     inconsistency = Inconsistency(rule = rule, fragment = fragment, user = user, inconsistency_type=inconsistency_type)
                     inconsistency.save()
-                    # dict_inconsistency = model_to_dict(inconsistency, fields=["id","inconsistencyType"])
-                    # dict_inconsistency['rule'] = model_to_dict(rule, fields=["id", "pattern", "warning","name", "rule_type"])
-                    # dict_inconsistency['fragment'] = model_to_dict(fragment, fields=["id", "content", "position"])
-                    # inconsistencies.append(dict_inconsistency)
 
-            # result.append({
-            #     'fragment': dict_fragment,
-            #     'inconsistencies': inconsistencies
-            # })
-        # return result
+    def rebuild_text(self, sentences):
+        new_text = ""
+        limit = len(sentences)
+        for key in range(limit):
+            if key > 0 and sentences[key]['fragment']['position'] > sentences[key-1]['fragment']['position']:
+                new_text = new_text + "\n" + sentences[key]['fragment']['content'] + "."
+            else:
+                new_text = new_text + sentences[key]['fragment']['content'] + "."
+        return new_text
+
+
+    def get_fragment_inconsistencies_by_id(self, sentences, fragment_id):
+        fragment = None
+        inconsistencies = []
+        for sentence in sentences:
+            if sentence['fragment']['id'] == fragment_id:
+                fragment = sentence['fragment']
+                inconsistencies = sentence['inconsistencies']
+                break
+        return fragment, inconsistencies
+
+    def get_inconsistency_by_id(self, inconsistencies, inconsistency_id):
+        incon = None
+        for inconsistency in inconsistencies:
+            if inconsistency['id'] == inconsistency_id:
+                incon = inconsistency
+                break
+        return incon
+
+    def fix_text(self, text_id, sentences):
+        text = Text.objects.filter(id=text_id)[0]
+        fragments = Fragment.objects.filter(text=text)
+        new_text = self.rebuild_text(sentences)
+        text.content = new_text
+        text.save()
+        for fragment in fragments:
+            dict_fragment, dict_inconsistencies = self.get_fragment_inconsistencies_by_id(sentences, fragment.id)
+            fragment.content = dict_fragment['content']
+            inconsistencies = Inconsistency.objects.filter(fragment=fragment)
+            for inconsistency in inconsistencies:
+                dict_inconsistency = self.get_inconsistency_by_id(dict_inconsistencies, inconsistency.id)
+                inconsistency_type = InconsistencyType.objects.all().filter(id=dict_inconsistency['inconsistency_type'])[0]
+                inconsistency.inconsistency_type = inconsistency_type
+                inconsistency.save()
+            fragment.save()
+
+
+    def request_fix_text(self, request):
+        get_json = json.loads(request.body.decode('utf-8'))
+        try:
+            self.fix_text(text_id=get_json['id'], sentences=get_json['sentences'])
+            return 200
+        except Exception as e:
+            return 300
 
 
     def create(self, title, content, list_rules, user):

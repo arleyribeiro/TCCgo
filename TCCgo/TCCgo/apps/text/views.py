@@ -78,6 +78,11 @@ def get_processed_text(request):
     result = controller.request_get_processed_text(request)
     return JsonResponse(result, safe=False)
 
+def fix_text(request):
+    controller = TextController()
+    result = controller.request_fix_text(request)
+    return JsonResponse(result, safe=False)
+
 def get_all_texts(request):
     """ Return all texts"""
     data = TextController.get_all(request.user)

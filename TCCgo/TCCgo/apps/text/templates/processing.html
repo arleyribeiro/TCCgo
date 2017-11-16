@@ -36,7 +36,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-10 col-md-offset-1" style="text-align:right; margin-top:20px">
         <button type="button" class="btn btn-primary" ng-click="salvar()"> Salvar </button>
       </div>
     </div>
@@ -85,6 +85,14 @@ app.controller("textController", function ($scope, $http){
 
   $scope.salvar = function(){
     alert("teste");
+    $http.post('/text/fix_text',
+      {
+        'id' : myID,
+        'sentences': $scope.sentences
+      }
+    ).then(function(response){
+        
+    });
   }
 
   angular.element(document).ready(function(){
