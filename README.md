@@ -19,20 +19,40 @@ Após a instalação do gerenciador, para que não haja conflito entre pacotes d
 ```
 $ sudo pip install virtualenv
 ```
-Após instalado, é necessário criar o ambiente. Como padrão, cria-se um ambiente na sua pasta principal, e esse é um diretório oculto de nome `.virtualenvs`. Assim, para criá-lo, execute:
+Para criar um novo ambiente virtual, basta executar o comando:
 ```
 $ cd ~
-$ mkdir .virtualenvs
-$ cd .virtualenvs
-$ virtualenv TCCgoEnv
+$ virtualenv -p python3 TCCgoEnv
 ```
-Para ativar o ambiente (deve ser feito sempre que se deseja executar a aplicação), deve-se executar o arquivo `activate` da seguinte forma:
+Onde `TCCgoEnv` é o nome do ambiente virtual a ser criado, e o parâmetro `-p` específica a versão do Python a ser utilizada.
+
+#### Ativando o ambiente virtual
+Para ativar o ambiente (deve ser feito sempre que se deseja executar a aplicação), deve-se executar o arquivo `activate` da seguinte forma, dentro da pasta do ambiente virtual.
 ```
-$ source ~/.virtualenvs/TCCgoEnv/bin/activate
+$ source bin/activate
 ```
+
+#### Desativando o ambiente virtual
+```
+$ desactivate
+```
+
+###Dependências
 Com o ambiente ativado, pode-se instalar o Django:
 ```
-$ ~/.virtualenvs/TCCgoEnv/bin/pip3 install django
+$ pip install django==1.11.5
+```
+
+###Criando um arquivo de dependências
+Para facilitar a instalação, criamos um arquivo com as dependências do projeto, para atualiza-lo, basta executar o comando;
+```
+$ pip freeze > requirements.txt
+```
+
+###Instalando dependências
+Dentro da pasta do projeto que contém o arquivo com as dependências, execute:
+```
+$ pip install -r requirements.txt
 ```
 
 #### Código Fonte
@@ -42,11 +62,7 @@ $ git clone https://github.com/andrelbol/TCCgo.git
 ```
 
 ## Execução
-Para executar o programa, basta ativar o ambiente virtual e logo após ativar o servidor:
-```
-$ source ~/.virtualenvs/TCCgoEnv/bin/activate
-```
-Navegue até a pasta onde foi clonado o projeto e execute o seguinte comando:
+Após ativar o ambiente virtual execute o arquivo `manage.py` com o seguinte comando:
 ```
 $ python TCCgo/manage.py runserver
 ```
