@@ -37,19 +37,19 @@ $ source bin/activate
 $ desactivate
 ```
 
-###Dependências
+### Dependências
 Com o ambiente ativado, pode-se instalar o Django:
 ```
 $ pip install django==1.11.5
 ```
 
-###Criando um arquivo de dependências
+### Criando um arquivo de dependências
 Para facilitar a instalação, criamos um arquivo com as dependências do projeto, para atualiza-lo, basta executar o comando;
 ```
 $ pip freeze > requirements.txt
 ```
 
-###Instalando dependências
+### Instalando dependências
 Dentro da pasta do projeto que contém o arquivo com as dependências, execute:
 ```
 $ pip install -r requirements.txt
